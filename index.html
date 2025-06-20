@@ -1,5 +1,23 @@
 <html>
   <body>
     My First Github Page Updated
+    <div id="location-info"></div>
+
+    <script>
+      fetch('http://api.ipstack.com/check?access_key=c30488184006475d64ed23dfcf4dc153')
+        .then(response => response.json())
+        .then(data => {
+          const locationDiv = document.getElementById('location-info');
+          locationDiv.innerHTML = `
+            <p>IP Address: ${data.ip}</p>
+            <p>Location: ${data.city}, ${data.region_name}, ${data.country_name}</p>
+          `;
+        })
+        .catch(error => {
+          console.error('Error fetching location data:', error);
+          const locationDiv = document.getElementById('location-info');
+          locationDiv.innerHTML = '<p>Could not fetch location data.</p>';
+        });
+    </script>
   </body>
 </html>
