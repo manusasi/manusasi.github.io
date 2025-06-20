@@ -1,15 +1,19 @@
 <div class="todo-container">
-  <h2>My To-Do List</h2>
+  <header class="app-header">
+    <a routerLink="/" class="back-link">← Back to Apps</a>
+    <h2>Todo List</h2>
+    <p>Manage your tasks with drag-and-drop reordering</p>
+    <button (click)="logout()" class="logout-btn">Sign Out</button>
+  </header>
 
   <!-- Add Todo Form -->
-  <form (ngSubmit)="addTodo()" class="add-todo-form">
+  <form class="add-todo-form" (ngSubmit)="addTodo()">
     <input
       type="text"
       [(ngModel)]="newTodoTitle"
       name="newTodoTitle"
-      placeholder="What needs to be done?"
+      placeholder="Add a new todo..."
       class="todo-input"
-      required
     />
     <button type="submit" class="btn add-btn">Add</button>
   </form>
@@ -37,15 +41,14 @@
       <input
         type="text"
         [(ngModel)]="editingTodo!.title"
-        name="editingTodoTitle"
-        (keydown.enter)="saveTodo()"
-        (keydown.escape)="cancelEdit()"
+        name="editTitle"
         class="edit-input"
+        (keyup.enter)="saveTodo()"
+        (keyup.escape)="cancelEdit()"
+        autofocus
       />
-      <div class="actions">
-        <button (click)="saveTodo()" class="btn save-btn">Save</button>
-        <button (click)="cancelEdit()" class="btn cancel-btn">Cancel</button>
-      </div>
+      <button (click)="saveTodo()" class="btn save-btn">Save</button>
+      <button (click)="cancelEdit()" class="btn cancel-btn">Cancel</button>
     </div>
   </ng-template>
 </div> 

@@ -1,15 +1,17 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule, Router } from '@angular/router';
 import { AuthService } from './auth.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   template: `
     <div class="login-container">
-      <h2>Welcome to your To-Do List</h2>
-      <p>Please sign in to continue</p>
+      <a routerLink="/" class="back-link">← Back to Apps</a>
+      <h2>Sign in to Todo List</h2>
+      <p>Please sign in to access your personal todo list</p>
       <button (click)="login()" class="login-btn">
         <img src="/assets/google-logo.svg" alt="Google logo" class="google-logo" />
         Sign in with Google
@@ -24,7 +26,24 @@ import { AuthService } from './auth.service';
       justify-content: center;
       text-align: center;
       margin-top: 5rem;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+      padding: 2rem;
     }
+    
+    .back-link {
+      display: inline-block;
+      color: #007bff;
+      text-decoration: none;
+      margin-bottom: 2rem;
+      font-weight: 500;
+    }
+    
+    .back-link:hover {
+      text-decoration: underline;
+    }
+    
     .login-btn {
       display: flex;
       align-items: center;
@@ -52,10 +71,13 @@ import { AuthService } from './auth.service';
   `]
 })
 export class LoginComponent {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService, private router: Router) {}
 
   login() {
-    this.authService.signInWithGoogle().catch((error: any) => {
+    this.authService.signInWithGoogle().then(() => {
+      // Redirect to todo page after successful login
+      this.router.navigate(['/todo']);
+    }).catch((error: any) => {
       console.error("Login failed:", error);
       // Optionally, show a message to the user
     });
