@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Firestore, collection, collectionData, doc, addDoc, updateDoc, deleteDoc, CollectionReference, query, where } from '@angular/fire/firestore';
+import { Firestore, collection, collectionData, doc, addDoc, updateDoc, deleteDoc, CollectionReference, query, where, orderBy, writeBatch, getDocs } from '@angular/fire/firestore';
 import { Observable, of, from } from 'rxjs';
 import { switchMap, take } from 'rxjs/operators';
 import { Todo } from './todo.model';
@@ -19,7 +19,7 @@ export class TodoService {
     return this.authService.user$.pipe(
       switchMap(user => {
         if (user) {
-          const userTodosQuery = query(this.todosCollection, where('userId', '==', user.uid));
+          const userTodosQuery = query(this.todosCollection, where('userId', '==', user.uid), orderBy('position'));
           return collectionData(userTodosQuery, { idField: 'id' }) as Observable<Todo[]>;
         } else {
           // Return an empty array if the user is not logged in
@@ -36,12 +36,19 @@ export class TodoService {
         if (!user) {
           return of(Promise.reject('User not logged in'));
         }
-        const newTodo: Omit<Todo, 'id'> = {
-          title,
-          completed: false,
-          userId: user.uid
-        };
-        return from(addDoc(this.todosCollection, newTodo));
+        
+        return from(getDocs(query(this.todosCollection, where('userId', '==', user.uid)))).pipe(
+          switchMap(snapshot => {
+            const newPosition = snapshot.size;
+            const newTodo: Omit<Todo, 'id'> = {
+              title,
+              completed: false,
+              userId: user.uid,
+              position: newPosition
+            };
+            return from(addDoc(this.todosCollection, newTodo));
+          })
+        );
       })
     );
   }
@@ -59,5 +66,16 @@ export class TodoService {
   deleteTodo(id: string): Promise<void> {
     const todoRef = doc(this.firestore, `todos/${id}`);
     return deleteDoc(todoRef);
+  }
+
+  updateTodoPosition(todos: Todo[]): Promise<void> {
+    const batch = writeBatch(this.firestore);
+    todos.forEach((todo, index) => {
+      if(todo.id) {
+        const todoRef = doc(this.firestore, `todos/${todo.id}`);
+        batch.update(todoRef, { position: index });
+      }
+    });
+    return batch.commit();
   }
 } 

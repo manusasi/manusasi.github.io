@@ -15,37 +15,37 @@
   </form>
 
   <!-- Todo List -->
-  <ul class="todo-list">
-    <li *ngFor="let todo of todos$ | async" [class.completed]="todo.completed">
-      <div *ngIf="editingTodo?.id !== todo.id; else editMode" class="view-mode">
-        <input
-          type="checkbox"
-          [checked]="todo.completed"
-          (change)="toggleCompletion(todo)"
-          class="todo-checkbox"
-        />
-        <span class="todo-title">{{ todo.title }}</span>
-        <div class="actions">
-          <button (click)="editTodo(todo)" class="btn edit-btn">Edit</button>
-          <button (click)="deleteTodo(todo.id)" class="btn delete-btn">Delete</button>
-        </div>
-      </div>
-      <ng-template #editMode>
-        <div class="edit-mode">
-          <input
-            type="text"
-            [(ngModel)]="editingTodo!.title"
-            name="editingTodoTitle"
-            (keydown.enter)="saveTodo()"
-            (keydown.escape)="cancelEdit()"
-            class="edit-input"
-          />
+  <div class="todo-list">
+    <div cdkDropList (cdkDropListDropped)="drop($event)">
+      <div *ngFor="let todo of todos" cdkDrag class="todo-item" [class.completed]="todo.completed">
+        <div class="todo-item-details">
+          <input type="checkbox" [checked]="todo.completed" (change)="toggleCompletion(todo)">
+          <div *ngIf="editingTodo?.id !== todo.id; else editTpl" (dblclick)="editTodo(todo)" class="todo-title">
+            {{ todo.title }}
+          </div>
           <div class="actions">
-            <button (click)="saveTodo()" class="btn save-btn">Save</button>
-            <button (click)="cancelEdit()" class="btn cancel-btn">Cancel</button>
+            <button (click)="editTodo(todo)" class="btn edit-btn">Edit</button>
+            <button (click)="deleteTodo(todo.id)" class="btn delete-btn">Delete</button>
           </div>
         </div>
-      </ng-template>
-    </li>
-  </ul>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #editTpl>
+    <div class="edit-mode">
+      <input
+        type="text"
+        [(ngModel)]="editingTodo!.title"
+        name="editingTodoTitle"
+        (keydown.enter)="saveTodo()"
+        (keydown.escape)="cancelEdit()"
+        class="edit-input"
+      />
+      <div class="actions">
+        <button (click)="saveTodo()" class="btn save-btn">Save</button>
+        <button (click)="cancelEdit()" class="btn cancel-btn">Cancel</button>
+      </div>
+    </div>
+  </ng-template>
 </div> 

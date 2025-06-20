@@ -4,25 +4,33 @@ import { FormsModule } from '@angular/forms';
 import { Todo } from './todo.model';
 import { TodoService } from './todo.service';
 import { Observable } from 'rxjs';
+import { CdkDragDrop, moveItemInArray, DragDropModule } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-todo',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, DragDropModule],
   templateUrl: './todo.component.html',
   styleUrls: ['./todo.component.css']
 })
 export class TodoComponent implements OnInit {
   todos$: Observable<Todo[]>;
+  todos: Todo[] = [];
   newTodoTitle = '';
   editingTodo: Todo | null = null;
   originalTitle = '';
 
   constructor(private todoService: TodoService) {
     this.todos$ = this.todoService.getTodos();
+    this.todos$.subscribe(todos => this.todos = todos);
   }
 
   ngOnInit(): void {}
+
+  drop(event: CdkDragDrop<Todo[]>) {
+    moveItemInArray(this.todos, event.previousIndex, event.currentIndex);
+    this.todoService.updateTodoPosition(this.todos);
+  }
 
   addTodo(): void {
     if (this.newTodoTitle.trim()) {
