@@ -26,8 +26,14 @@ export class TodoComponent implements OnInit {
 
   addTodo(): void {
     if (this.newTodoTitle.trim()) {
-      this.todoService.addTodo(this.newTodoTitle.trim());
-      this.newTodoTitle = '';
+      this.todoService.addTodo(this.newTodoTitle.trim()).subscribe({
+        next: () => {
+          this.newTodoTitle = '';
+        },
+        error: (err) => {
+          console.error('Error adding todo:', err);
+        }
+      });
     }
   }
 

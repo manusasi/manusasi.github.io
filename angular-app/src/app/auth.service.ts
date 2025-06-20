@@ -7,13 +7,9 @@ import { Observable } from 'rxjs';
 })
 export class AuthService {
   public readonly user$: Observable<User | null>;
-  public currentUserId: string | null = null;
 
   constructor(private auth: Auth) {
     this.user$ = user(this.auth);
-    this.user$.subscribe(user => {
-      this.currentUserId = user ? user.uid : null;
-    });
   }
 
   signInWithGoogle(): Promise<any> {

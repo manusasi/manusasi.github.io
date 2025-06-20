@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Firestore, collection, collectionData, doc, addDoc, updateDoc, deleteDoc, CollectionReference, query, where } from '@angular/fire/firestore';
-import { Observable, of } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { Observable, of, from } from 'rxjs';
+import { switchMap, take } from 'rxjs/operators';
 import { Todo } from './todo.model';
 import { AuthService } from './auth.service';
 
@@ -29,17 +29,21 @@ export class TodoService {
     );
   }
 
-  addTodo(title: string): Promise<any> {
-    const userId = this.authService.currentUserId;
-    if (!userId) {
-      return Promise.reject('User not logged in');
-    }
-    const newTodo: Omit<Todo, 'id'> = {
-      title,
-      completed: false,
-      userId
-    };
-    return addDoc(this.todosCollection, newTodo);
+  addTodo(title: string): Observable<any> {
+    return this.authService.user$.pipe(
+      take(1),
+      switchMap(user => {
+        if (!user) {
+          return of(Promise.reject('User not logged in'));
+        }
+        const newTodo: Omit<Todo, 'id'> = {
+          title,
+          completed: false,
+          userId: user.uid
+        };
+        return from(addDoc(this.todosCollection, newTodo));
+      })
+    );
   }
 
   updateTodo(todo: Todo): Promise<void> {
