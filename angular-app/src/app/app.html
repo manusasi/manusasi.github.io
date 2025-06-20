@@ -1,0 +1,16 @@
+<div class="container">
+  <h1>Location Information</h1>
+  <div *ngIf="location$ | async as location; else loading">
+    <div *ngIf="!location.error; else error">
+      <p><strong>IP Address:</strong> {{ location.ip }}</p>
+      <p><strong>Location:</strong> {{ location.city }}, {{ location.region_name }}, {{ location.country_name }}</p>
+    </div>
+    <ng-template #error>
+      <p class="error">Could not fetch location data. The API key may be invalid or the service may be down.</p>
+    </ng-template>
+  </div>
+  <ng-template #loading>
+    <p>Loading location data...</p>
+  </ng-template>
+</div>
+<router-outlet />
