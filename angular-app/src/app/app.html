@@ -18,6 +18,16 @@
 
 <hr>
 
-<app-todo></app-todo>
+<div *ngIf="user$ | async as user; else login">
+  <header>
+    <h1>{{ user.displayName }}'s To-Do List</h1>
+    <button (click)="logout()" class="logout-btn">Sign Out</button>
+  </header>
+  <app-todo></app-todo>
+</div>
+
+<ng-template #login>
+  <app-login></app-login>
+</ng-template>
 
 <router-outlet />
