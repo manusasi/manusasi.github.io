@@ -1,0 +1,83 @@
+.todo-container {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  background-color: #fff;
+}
+
+h2 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 1.5rem;
+}
+
+.add-todo-form {
+  display: flex;
+  margin-bottom: 1.5rem;
+}
+
+.todo-input {
+  flex-grow: 1;
+  padding: 0.75rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.btn {
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-left: 0.5rem;
+  color: white;
+}
+
+.add-btn { background-color: #28a745; }
+.edit-btn { background-color: #ffc107; color: #333; }
+.delete-btn { background-color: #dc3545; }
+.save-btn { background-color: #007bff; }
+.cancel-btn { background-color: #6c757d; }
+
+.todo-list {
+  list-style: none;
+  padding: 0;
+}
+
+.todo-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem;
+  border-bottom: 1px solid #eee;
+}
+
+.todo-list li.completed .todo-title {
+  text-decoration: line-through;
+  color: #888;
+}
+
+.view-mode, .edit-mode {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.todo-checkbox {
+  margin-right: 1rem;
+}
+
+.todo-title {
+  flex-grow: 1;
+}
+
+.edit-input {
+  flex-grow: 1;
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+} 
