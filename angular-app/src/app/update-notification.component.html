@@ -1,0 +1,32 @@
+<div *ngIf="updateAvailable" 
+     class="fixed bottom-4 right-4 z-50 max-w-sm w-full">
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-4">
+    <div class="flex items-start space-x-3">
+      <div class="flex-shrink-0">
+        <svg class="w-6 h-6 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+      </div>
+      <div class="flex-1 min-w-0">
+        <h3 class="text-sm font-medium text-gray-900 dark:text-white">
+          Update Available
+        </h3>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          A new version is available. Click to update.
+        </p>
+      </div>
+      <div class="flex items-center space-x-2">
+        <button (click)="updateApp()" 
+                class="btn-primary text-xs px-3 py-1">
+          Update
+        </button>
+        <button (click)="dismiss()" 
+                class="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors duration-200">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div> 
