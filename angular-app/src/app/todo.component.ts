@@ -1,12 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { Todo } from './todo.model';
 import { TodoService } from './todo.service';
+import { TodoListService } from './todo-list.service';
 import { AuthService } from './auth.service';
-import { Observable } from 'rxjs';
+import { Observable, switchMap } from 'rxjs';
 import { CdkDragDrop, moveItemInArray, DragDropModule } from '@angular/cdk/drag-drop';
+import { TodoList } from './todo-list.model';
 
 @Component({
   selector: 'app-todo',
@@ -21,13 +23,40 @@ export class TodoComponent implements OnInit {
   newTodoTitle = '';
   editingTodo: Todo | null = null;
   originalTitle = '';
+  currentList$: Observable<TodoList | null>;
+  listId: string | null = null;
 
-  constructor(private todoService: TodoService, private authService: AuthService) {
-    this.todos$ = this.todoService.getTodos();
-    this.todos$.subscribe(todos => this.todos = todos);
+  constructor(
+    private todoService: TodoService, 
+    private todoListService: TodoListService,
+    private authService: AuthService,
+    private route: ActivatedRoute,
+    private router: Router
+  ) {
+    this.todos$ = new Observable();
+    this.currentList$ = new Observable();
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.route.params.subscribe(params => {
+      this.listId = params['id'];
+      if (this.listId) {
+        this.todos$ = this.todoService.getTodosForList(this.listId);
+        this.todos$.subscribe(todos => this.todos = todos);
+        
+        // Get the current list details
+        this.currentList$ = this.todoListService.getLists().pipe(
+          switchMap(lists => {
+            const list = lists.find(l => l.id === this.listId);
+            return new Observable<TodoList | null>(observer => {
+              observer.next(list || null);
+              observer.complete();
+            });
+          })
+        );
+      }
+    });
+  }
 
   drop(event: CdkDragDrop<Todo[]>) {
     moveItemInArray(this.todos, event.previousIndex, event.currentIndex);
@@ -35,8 +64,8 @@ export class TodoComponent implements OnInit {
   }
 
   addTodo(): void {
-    if (this.newTodoTitle.trim()) {
-      this.todoService.addTodo(this.newTodoTitle.trim()).subscribe({
+    if (this.newTodoTitle.trim() && this.listId) {
+      this.todoService.addTodo(this.listId, this.newTodoTitle.trim()).subscribe({
         next: () => {
           this.newTodoTitle = '';
         },
@@ -77,5 +106,9 @@ export class TodoComponent implements OnInit {
 
   logout(): void {
     this.authService.signOut();
+  }
+
+  backToLists(): void {
+    this.router.navigate(['/lists']);
   }
 } 

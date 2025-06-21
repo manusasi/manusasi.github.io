@@ -15,15 +15,12 @@
   </ng-template>
 </div>
 -->
-
-<hr>
-
 <div *ngIf="user$ | async as user; else login">
   <header>
-    <h1>{{ user.displayName }}'s To-Do List</h1>
+    <h1>Welcome, {{ user.displayName }}!</h1>
     <button (click)="logout()" class="logout-btn">Sign Out</button>
   </header>
-  <app-todo></app-todo>
+  <router-outlet />
 </div>
 
 <ng-template #login>

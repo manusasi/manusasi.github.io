@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { AuthService } from './auth.service';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-home',
@@ -23,9 +25,12 @@ import { RouterModule } from '@angular/router';
         
         <div class="app-card">
           <div class="app-icon">✅</div>
-          <h3>Todo List</h3>
-          <p>Manage your tasks with drag-and-drop reordering and cloud sync</p>
-          <a routerLink="/todo" class="app-link">Get started</a>
+          <h3>Todo Lists</h3>
+          <p>Manage your tasks with drag-and-drop reordering, cloud sync, and sharing</p>
+          <a *ngIf="user$ | async; else loginLink" routerLink="/lists" class="app-link">Get started</a>
+          <ng-template #loginLink>
+            <a routerLink="/login" class="app-link">Sign in to start</a>
+          </ng-template>
         </div>
       </div>
     </div>
@@ -106,4 +111,10 @@ import { RouterModule } from '@angular/router';
     }
   `]
 })
-export class HomeComponent {} 
+export class HomeComponent {
+  user$;
+
+  constructor(private authService: AuthService) {
+    this.user$ = this.authService.user$;
+  }
+} 

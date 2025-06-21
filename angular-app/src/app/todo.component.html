@@ -1,8 +1,14 @@
 <div class="todo-container">
   <header class="app-header">
-    <a routerLink="/" class="back-link">← Back to Apps</a>
-    <h2>Todo List</h2>
-    <p>Manage your tasks with drag-and-drop reordering</p>
+    <a (click)="backToLists()" class="back-link">← Back to Lists</a>
+    <div *ngIf="currentList$ | async as list; else loadingList">
+      <h2>{{ list.title }}</h2>
+      <p *ngIf="list.description">{{ list.description }}</p>
+    </div>
+    <ng-template #loadingList>
+      <h2>Todo List</h2>
+      <p>Loading list details...</p>
+    </ng-template>
     <button (click)="logout()" class="logout-btn">Sign Out</button>
   </header>
 

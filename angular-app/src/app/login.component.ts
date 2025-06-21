@@ -75,8 +75,8 @@ export class LoginComponent {
 
   login() {
     this.authService.signInWithGoogle().then(() => {
-      // Redirect to todo page after successful login
-      this.router.navigate(['/todo']);
+      // Redirect to lists page after successful login
+      this.router.navigate(['/lists']);
     }).catch((error: any) => {
       console.error("Login failed:", error);
       // Optionally, show a message to the user
