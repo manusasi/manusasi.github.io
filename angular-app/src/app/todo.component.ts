@@ -7,11 +7,13 @@ import { TodoService } from './todo.service';
 import { TodoList } from './todo-list.model';
 import { Todo } from './todo.model';
 import { take } from 'rxjs';
+import { ListEditShareModalComponent } from './list-edit-share-modal.component';
+import { AuthService } from './auth.service';
 
 @Component({
   selector: 'app-todo',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ListEditShareModalComponent],
   templateUrl: './todo.component.html',
 })
 export class TodoComponent implements OnInit {
@@ -21,12 +23,16 @@ export class TodoComponent implements OnInit {
   error: string | null = null;
   newTodoText = '';
   isAdding = false;
+  showEditShareModal = false;
+  modalMode: 'edit' | 'share' = 'edit';
+  ownerName: string = '';
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private todoListService: TodoListService,
-    private todoService: TodoService
+    private todoService: TodoService,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
@@ -57,6 +63,9 @@ export class TodoComponent implements OnInit {
             }
             
             console.log('Found todo list:', this.todoList);
+            
+            // Get the owner name
+            this.getOwnerName(this.todoList.owner);
             
             // Check access before loading todos
             this.todoListService.hasAccess(listId).then(hasAccess => {
@@ -168,13 +177,38 @@ export class TodoComponent implements OnInit {
   }
 
   editList() {
-    // Implement edit list logic or open a modal
-    alert('Edit list feature coming soon!');
+    this.modalMode = 'edit';
+    this.showEditShareModal = true;
   }
 
   shareList() {
-    // Implement share list logic or open a modal
-    alert('Share list feature coming soon!');
+    this.modalMode = 'share';
+    this.showEditShareModal = true;
+  }
+
+  closeModal() {
+    this.showEditShareModal = false;
+  }
+
+  handleSaveEdit({ title, description }: { title: string; description: string }) {
+    if (!this.todoList) return;
+    const updatedList: TodoList = {
+      ...this.todoList,
+      title,
+      description: description || undefined
+    };
+    this.todoListService.updateList(updatedList).then(() => {
+      this.todoList = updatedList;
+      this.closeModal();
+    });
+  }
+
+  handleShare(email: string) {
+    if (!this.todoList) return;
+    this.todoListService.shareList(this.todoList.id!, email).then(() => {
+      // Optionally update local state
+      this.closeModal();
+    });
   }
 
   copyToClipboard(text: string) {
@@ -209,5 +243,19 @@ export class TodoComponent implements OnInit {
     }
     
     return null;
+  }
+
+  getOwnerName(ownerId: string): void {
+    // Try to get the current user first (if it's the current user)
+    this.authService.user$.pipe(take(1)).subscribe(currentUser => {
+      if (currentUser && currentUser.uid === ownerId) {
+        this.ownerName = currentUser.displayName || currentUser.email || 'Unknown User';
+        return;
+      }
+      
+      // If it's not the current user, we'll show a generic name for now
+      // In a real app, you might want to store user profiles in Firestore
+      this.ownerName = 'Unknown User';
+    });
   }
 } 

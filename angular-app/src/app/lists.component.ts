@@ -7,11 +7,12 @@ import { TodoListService } from './todo-list.service';
 import { AuthService } from './auth.service';
 import { Observable, take } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { ListEditShareModalComponent } from './list-edit-share-modal.component';
 
 @Component({
   selector: 'app-lists',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, ListEditShareModalComponent],
   templateUrl: './lists.component.html'
 })
 export class ListsComponent implements OnInit {
@@ -29,6 +30,9 @@ export class ListsComponent implements OnInit {
   editingList: TodoList | null = null;
   editListTitle = '';
   editListDescription = '';
+  showEditShareModal = false;
+  modalMode: 'edit' | 'share' = 'edit';
+  modalList: TodoList | null = null;
 
   constructor(
     private todoListService: TodoListService,
@@ -112,37 +116,40 @@ export class ListsComponent implements OnInit {
   }
 
   openEditModal(list: TodoList) {
-    this.editingList = list;
-    this.editListTitle = list.title;
-    this.editListDescription = list.description || '';
-    this.showEditModal = true;
+    this.modalList = list;
+    this.modalMode = 'edit';
+    this.showEditShareModal = true;
   }
 
-  closeEditModal() {
-    this.showEditModal = false;
-    this.editingList = null;
-    this.editListTitle = '';
-    this.editListDescription = '';
+  openShareModal(list: TodoList) {
+    this.modalList = list;
+    this.modalMode = 'share';
+    this.showEditShareModal = true;
   }
 
-  saveEditList() {
-    if (!this.editingList || !this.editListTitle.trim()) return;
+  closeModal() {
+    this.showEditShareModal = false;
+    this.modalList = null;
+  }
 
+  handleSaveEdit({ title, description }: { title: string; description: string }) {
+    if (!this.modalList) return;
     const updatedList: TodoList = {
-      ...this.editingList,
-      title: this.editListTitle.trim(),
-      description: this.editListDescription.trim() || undefined
+      ...this.modalList,
+      title,
+      description: description || undefined
     };
-
     this.todoListService.updateList(updatedList).then(() => {
-      // Update the list in the local array
-      const index = this.todoLists.findIndex(l => l.id === this.editingList!.id);
-      if (index !== -1) {
-        this.todoLists[index] = updatedList;
-      }
-      this.closeEditModal();
-    }).catch((error: any) => {
-      console.error('Error updating list:', error);
+      this.loadLists();
+      this.closeModal();
+    });
+  }
+
+  handleShare(email: string) {
+    if (!this.modalList) return;
+    this.todoListService.shareList(this.modalList.id!, email).then(() => {
+      this.loadLists();
+      this.closeModal();
     });
   }
 
@@ -164,29 +171,6 @@ export class ListsComponent implements OnInit {
         console.error('Error deleting list:', error);
       });
     }
-  }
-
-  shareList(list: TodoList) {
-    this.sharingList = list;
-    this.showShareModal = true;
-  }
-
-  confirmShare() {
-    if (!this.shareEmail.trim() || !this.sharingList) return;
-
-    this.todoListService.shareList(this.sharingList.id!, this.shareEmail.trim()).then(() => {
-      this.showShareModal = false;
-      this.shareEmail = '';
-      this.sharingList = null;
-    }).catch((error: any) => {
-      console.error('Error sharing list:', error);
-    });
-  }
-
-  cancelShare() {
-    this.showShareModal = false;
-    this.shareEmail = '';
-    this.sharingList = null;
   }
 
   // Helper method to convert Firestore Timestamp to JavaScript Date
@@ -214,5 +198,13 @@ export class ListsComponent implements OnInit {
     }
     
     return null;
+  }
+
+  // Helper method to get shared count safely
+  getSharedCount(list: TodoList | null): number {
+    if (!list || !list.sharedWith) {
+      return 0;
+    }
+    return list.sharedWith.length;
   }
 } 

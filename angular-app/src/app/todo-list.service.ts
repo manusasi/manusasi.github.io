@@ -69,9 +69,8 @@ export class TodoListService {
         }
         
         const now = new Date();
-        const newList: Omit<TodoList, 'id'> = {
+        const newListData: any = {
           title,
-          description,
           owner: user.uid,
           sharedWith: [],
           createdAt: now,
@@ -79,7 +78,13 @@ export class TodoListService {
           isPublic: false
         };
         
-        return from(addDoc(this.listsCollection, newList));
+        // Only add description if it's not empty or undefined
+        if (description && description.trim()) {
+          newListData.description = description.trim();
+        }
+        
+        console.log('Creating list with data:', newListData);
+        return from(addDoc(this.listsCollection, newListData));
       })
     );
   }
@@ -94,6 +99,14 @@ export class TodoListService {
     const { id, ...dataToUpdate } = list;
     dataToUpdate.updatedAt = new Date();
     
+    // Remove undefined values
+    Object.keys(dataToUpdate).forEach(key => {
+      if (dataToUpdate[key as keyof typeof dataToUpdate] === undefined) {
+        delete dataToUpdate[key as keyof typeof dataToUpdate];
+      }
+    });
+    
+    console.log('Updating list with data:', dataToUpdate);
     return updateDoc(listRef, dataToUpdate);
   }
 
@@ -105,24 +118,43 @@ export class TodoListService {
 
   // Share a list with a user by email
   async shareList(listId: string, userEmail: string): Promise<void> {
+    console.log('TodoListService: Sharing list', listId, 'with email:', userEmail);
+    
     const listRef = doc(this.firestore, `todoLists/${listId}`);
     
-    // Get the current list data
-    const listDoc = await getDoc(listRef);
-    if (!listDoc.exists()) {
-      throw new Error('List not found');
+    try {
+      // Get the current list data
+      const listDoc = await getDoc(listRef);
+      if (!listDoc.exists()) {
+        throw new Error('List not found');
+      }
+      
+      const list = listDoc.data() as TodoList;
+      console.log('TodoListService: Current list data:', list);
+      
+      // Check if email is already shared
+      if (list.sharedWith && list.sharedWith.includes(userEmail)) {
+        console.log('TodoListService: Email already shared');
+        throw new Error('List is already shared with this email');
+      }
+      
+      // For now, we'll store emails in sharedWith array
+      // In a production app, you'd want to look up the user by email and store their UID
+      const updatedSharedWith = [...(list.sharedWith || []), userEmail];
+      console.log('TodoListService: Updated sharedWith array:', updatedSharedWith);
+      
+      const updateData = {
+        sharedWith: updatedSharedWith,
+        updatedAt: new Date()
+      };
+      console.log('TodoListService: Updating list with data:', updateData);
+      
+      await updateDoc(listRef, updateData);
+      console.log('TodoListService: List shared successfully');
+    } catch (error) {
+      console.error('TodoListService: Error sharing list:', error);
+      throw error;
     }
-    
-    const list = listDoc.data() as TodoList;
-    
-    // For now, we'll store emails in sharedWith array
-    // In a production app, you'd want to look up the user by email and store their UID
-    const updatedSharedWith = [...(list.sharedWith || []), userEmail];
-    
-    await updateDoc(listRef, {
-      sharedWith: updatedSharedWith,
-      updatedAt: new Date()
-    });
   }
 
   // Remove sharing from a list

@@ -142,7 +142,7 @@
           </div>
           <div class="flex justify-between">
             <span class="text-gray-600 dark:text-gray-400">Owner:</span>
-            <span class="text-gray-900 dark:text-white">{{ todoList.owner }}</span>
+            <span class="text-gray-900 dark:text-white">{{ ownerName || 'Loading...' }}</span>
           </div>
           <div class="flex justify-between">
             <span class="text-gray-600 dark:text-gray-400">Shared With:</span>
@@ -151,5 +151,14 @@
         </div>
       </div>
     </div>
+
+    <app-list-edit-share-modal
+      [open]="showEditShareModal"
+      [list]="todoList"
+      [mode]="modalMode"
+      (save)="handleSaveEdit($event)"
+      (share)="handleShare($event)"
+      (close)="closeModal()"
+    ></app-list-edit-share-modal>
   </div>
 </div> 

@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Firestore, collection, collectionData, doc, addDoc, updateDoc, deleteDoc, CollectionReference, query, where, orderBy, writeBatch, getDocs } from '@angular/fire/firestore';
 import { Observable, of, from } from 'rxjs';
-import { switchMap, take } from 'rxjs/operators';
+import { switchMap, take, catchError, map } from 'rxjs/operators';
 import { Todo } from './todo.model';
 import { AuthService } from './auth.service';
 import { TodoListService } from './todo-list.service';
@@ -31,14 +31,20 @@ export class TodoService {
         }
         
         console.log('TodoService: Creating query for todos in list:', listId);
-        // Simplified query - if user can access the list, they can access todos
+        // Simple query - just filter by listId
         const todosQuery = query(
           this.todosCollection, 
           where('listId', '==', listId)
         );
         
         console.log('TodoService: Executing todos query');
-        return collectionData(todosQuery, { idField: 'id' }) as Observable<Todo[]>;
+        return collectionData(todosQuery, { idField: 'id' }).pipe(
+          map(docs => docs as Todo[]),
+          catchError(error => {
+            console.error('TodoService: Error loading todos:', error);
+            return of([]);
+          })
+        );
       })
     );
   }
@@ -55,34 +61,23 @@ export class TodoService {
         
         console.log('Adding todo for user:', user.uid, 'to list:', listId);
         
-        // Check if user has access to this list
-        return from(this.todoListService.hasAccess(listId)).pipe(
-          switchMap(hasAccess => {
-            console.log('User has access to list:', hasAccess);
-            if (!hasAccess) {
-              console.error('Access denied to list:', listId);
-              return of(Promise.reject('Access denied'));
-            }
+        // Get current todos to determine position
+        return from(getDocs(query(this.todosCollection, where('listId', '==', listId)))).pipe(
+          switchMap(snapshot => {
+            const newPosition = snapshot.size;
+            const now = new Date();
+            const newTodo: Omit<Todo, 'id'> = {
+              title,
+              completed: false,
+              listId,
+              position: newPosition,
+              createdBy: user.uid,
+              createdAt: now,
+              updatedAt: now
+            };
             
-            // Get current todos to determine position
-            return from(getDocs(query(this.todosCollection, where('listId', '==', listId)))).pipe(
-              switchMap(snapshot => {
-                const newPosition = snapshot.size;
-                const now = new Date();
-                const newTodo: Omit<Todo, 'id'> = {
-                  title,
-                  completed: false,
-                  listId,
-                  position: newPosition,
-                  createdBy: user.uid,
-                  createdAt: now,
-                  updatedAt: now
-                };
-                
-                console.log('Creating todo with data:', newTodo);
-                return from(addDoc(this.todosCollection, newTodo));
-              })
-            );
+            console.log('Creating todo with data:', newTodo);
+            return from(addDoc(this.todosCollection, newTodo));
           })
         );
       })
