@@ -72,13 +72,41 @@ export class ListsComponent implements OnInit {
     const title = this.newListTitle.trim();
     const description = this.newListDescription.trim() || undefined;
 
+    // Add debugging to check authentication state
+    this.authService.user$.pipe(take(1)).subscribe(user => {
+      console.log('Current user:', user);
+      if (!user) {
+        console.error('No authenticated user found');
+        alert('Please log in to create a list');
+        return;
+      }
+    });
+
     this.todoListService.createList(title, description).subscribe({
       next: (createdList: any) => {
+        console.log('List created successfully:', createdList);
         this.todoLists.unshift(createdList);
         this.closeCreateModal();
       },
       error: (error: any) => {
         console.error('Error creating list:', error);
+        console.error('Error details:', {
+          code: error.code,
+          message: error.message,
+          details: error.details
+        });
+        
+        // Provide user-friendly error message
+        let errorMessage = 'Failed to create list. ';
+        if (error.code === 'permission-denied') {
+          errorMessage += 'You may not have permission to create lists. Please try logging out and back in.';
+        } else if (error.code === 'unauthenticated') {
+          errorMessage += 'Please log in to create lists.';
+        } else {
+          errorMessage += 'Please try again later.';
+        }
+        
+        alert(errorMessage);
       }
     });
   }
