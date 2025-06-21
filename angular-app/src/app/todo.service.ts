@@ -44,8 +44,8 @@ export class TodoService {
             console.log('TodoService: Creating query for todos in list:', listId);
             const todosQuery = query(
               this.todosCollection, 
-              where('listId', '==', listId), 
-              orderBy('position')
+              where('listId', '==', listId)
+              // Temporarily removed orderBy to avoid composite index requirement
             );
             
             console.log('TodoService: Executing todos query');
