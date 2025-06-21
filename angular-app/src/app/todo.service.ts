@@ -24,22 +24,31 @@ export class TodoService {
   getTodosForList(listId: string): Observable<Todo[]> {
     return this.authService.user$.pipe(
       switchMap(user => {
+        console.log('TodoService: Current user:', user);
         if (!user) {
+          console.log('TodoService: No authenticated user');
           return of([]);
         }
+        
+        console.log('TodoService: Checking access for list:', listId);
         
         // First check if user has access to this list
         return from(this.todoListService.hasAccess(listId)).pipe(
           switchMap(hasAccess => {
+            console.log('TodoService: User has access to list:', hasAccess);
             if (!hasAccess) {
+              console.log('TodoService: Access denied to list');
               return of([]);
             }
             
+            console.log('TodoService: Creating query for todos in list:', listId);
             const todosQuery = query(
               this.todosCollection, 
               where('listId', '==', listId), 
               orderBy('position')
             );
+            
+            console.log('TodoService: Executing todos query');
             return collectionData(todosQuery, { idField: 'id' }) as Observable<Todo[]>;
           })
         );

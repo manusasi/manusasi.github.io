@@ -6,6 +6,7 @@ import { TodoListService } from './todo-list.service';
 import { TodoService } from './todo.service';
 import { TodoList } from './todo-list.model';
 import { Todo } from './todo.model';
+import { take } from 'rxjs';
 
 @Component({
   selector: 'app-todo',
@@ -32,29 +33,79 @@ export class TodoComponent implements OnInit {
     const listId = this.route.snapshot.paramMap.get('id');
     if (listId) {
       this.isLoading = true;
-      this.todoListService.getLists().subscribe({
-        next: (lists) => {
-          this.todoList = lists.find(l => l.id === listId) || null;
-          if (!this.todoList) {
-            this.error = 'Todo list not found.';
-            this.isLoading = false;
-            return;
-          }
-          this.todoService.getTodosForList(listId).subscribe({
-            next: (todos) => {
-              this.todos = todos;
-              this.isLoading = false;
-            },
-            error: () => {
-              this.error = 'Failed to load todos.';
-              this.isLoading = false;
-            }
-          });
-        },
-        error: () => {
-          this.error = 'Failed to load todo list.';
+      this.error = null;
+      
+      console.log('Loading todos for list ID:', listId);
+      
+      // First check authentication
+      this.todoListService['authService'].user$.pipe(take(1)).subscribe(user => {
+        console.log('Current user when loading todos:', user);
+        if (!user) {
+          this.error = 'Please log in to view todos.';
           this.isLoading = false;
+          return;
         }
+        
+        this.todoListService.getLists().subscribe({
+          next: (lists) => {
+            console.log('All lists loaded:', lists);
+            this.todoList = lists.find(l => l.id === listId) || null;
+            if (!this.todoList) {
+              this.error = 'Todo list not found or you do not have access to it.';
+              this.isLoading = false;
+              return;
+            }
+            
+            console.log('Found todo list:', this.todoList);
+            
+            // Check access before loading todos
+            this.todoListService.hasAccess(listId).then(hasAccess => {
+              console.log('User has access to list:', hasAccess);
+              if (!hasAccess) {
+                this.error = 'You do not have permission to view this list.';
+                this.isLoading = false;
+                return;
+              }
+              
+              this.todoService.getTodosForList(listId).subscribe({
+                next: (todos) => {
+                  console.log('Todos loaded successfully:', todos);
+                  this.todos = todos;
+                  this.isLoading = false;
+                },
+                error: (error) => {
+                  console.error('Error loading todos:', error);
+                  console.error('Error details:', {
+                    code: error.code,
+                    message: error.message,
+                    details: error.details
+                  });
+                  
+                  let errorMessage = 'Failed to load todos. ';
+                  if (error.code === 'permission-denied') {
+                    errorMessage += 'You may not have permission to view todos in this list.';
+                  } else if (error.code === 'unauthenticated') {
+                    errorMessage += 'Please log in to view todos.';
+                  } else {
+                    errorMessage += 'Please try again later.';
+                  }
+                  
+                  this.error = errorMessage;
+                  this.isLoading = false;
+                }
+              });
+            }).catch(error => {
+              console.error('Error checking access:', error);
+              this.error = 'Failed to verify access to this list.';
+              this.isLoading = false;
+            });
+          },
+          error: (error) => {
+            console.error('Error loading todo list:', error);
+            this.error = 'Failed to load todo list.';
+            this.isLoading = false;
+          }
+        });
       });
     } else {
       this.error = 'No list ID provided.';
