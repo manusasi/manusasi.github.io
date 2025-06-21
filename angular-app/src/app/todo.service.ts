@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Firestore, collection, collectionData, doc, addDoc, updateDoc, deleteDoc, CollectionReference, query, where, orderBy, writeBatch, getDocs } from '@angular/fire/firestore';
 import { Observable, of, from } from 'rxjs';
 import { switchMap, take } from 'rxjs/operators';
@@ -10,10 +10,10 @@ import { TodoListService } from './todo-list.service';
   providedIn: 'root'
 })
 export class TodoService {
+  private firestore: Firestore = inject(Firestore);
   private todosCollection: CollectionReference;
 
   constructor(
-    private firestore: Firestore, 
     private authService: AuthService,
     private todoListService: TodoListService
   ) {
@@ -30,28 +30,15 @@ export class TodoService {
           return of([]);
         }
         
-        console.log('TodoService: Checking access for list:', listId);
-        
-        // First check if user has access to this list
-        return from(this.todoListService.hasAccess(listId)).pipe(
-          switchMap(hasAccess => {
-            console.log('TodoService: User has access to list:', hasAccess);
-            if (!hasAccess) {
-              console.log('TodoService: Access denied to list');
-              return of([]);
-            }
-            
-            console.log('TodoService: Creating query for todos in list:', listId);
-            const todosQuery = query(
-              this.todosCollection, 
-              where('listId', '==', listId)
-              // Temporarily removed orderBy to avoid composite index requirement
-            );
-            
-            console.log('TodoService: Executing todos query');
-            return collectionData(todosQuery, { idField: 'id' }) as Observable<Todo[]>;
-          })
+        console.log('TodoService: Creating query for todos in list:', listId);
+        // Simplified query - if user can access the list, they can access todos
+        const todosQuery = query(
+          this.todosCollection, 
+          where('listId', '==', listId)
         );
+        
+        console.log('TodoService: Executing todos query');
+        return collectionData(todosQuery, { idField: 'id' }) as Observable<Todo[]>;
       })
     );
   }
