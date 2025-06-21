@@ -22,6 +22,13 @@ export class ListsComponent implements OnInit {
   sharingList: TodoList | null = null;
   shareEmail = '';
   showShareModal = false;
+  
+  // Modal states
+  showCreateModal = false;
+  showEditModal = false;
+  editingList: TodoList | null = null;
+  editListTitle = '';
+  editListDescription = '';
 
   constructor(
     private todoListService: TodoListService,
@@ -47,6 +54,18 @@ export class ListsComponent implements OnInit {
     });
   }
 
+  openCreateModal() {
+    this.newListTitle = '';
+    this.newListDescription = '';
+    this.showCreateModal = true;
+  }
+
+  closeCreateModal() {
+    this.showCreateModal = false;
+    this.newListTitle = '';
+    this.newListDescription = '';
+  }
+
   createNewList() {
     if (!this.newListTitle.trim()) return;
 
@@ -56,12 +75,46 @@ export class ListsComponent implements OnInit {
     this.todoListService.createList(title, description).subscribe({
       next: (createdList: any) => {
         this.todoLists.unshift(createdList);
-        this.newListTitle = '';
-        this.newListDescription = '';
+        this.closeCreateModal();
       },
       error: (error: any) => {
         console.error('Error creating list:', error);
       }
+    });
+  }
+
+  openEditModal(list: TodoList) {
+    this.editingList = list;
+    this.editListTitle = list.title;
+    this.editListDescription = list.description || '';
+    this.showEditModal = true;
+  }
+
+  closeEditModal() {
+    this.showEditModal = false;
+    this.editingList = null;
+    this.editListTitle = '';
+    this.editListDescription = '';
+  }
+
+  saveEditList() {
+    if (!this.editingList || !this.editListTitle.trim()) return;
+
+    const updatedList: TodoList = {
+      ...this.editingList,
+      title: this.editListTitle.trim(),
+      description: this.editListDescription.trim() || undefined
+    };
+
+    this.todoListService.updateList(updatedList).then(() => {
+      // Update the list in the local array
+      const index = this.todoLists.findIndex(l => l.id === this.editingList!.id);
+      if (index !== -1) {
+        this.todoLists[index] = updatedList;
+      }
+      this.closeEditModal();
+    }).catch((error: any) => {
+      console.error('Error updating list:', error);
     });
   }
 
@@ -71,8 +124,7 @@ export class ListsComponent implements OnInit {
 
   editList(list: TodoList, event: Event) {
     event.stopPropagation();
-    // TODO: Implement edit functionality
-    console.log('Edit list:', list);
+    this.openEditModal(list);
   }
 
   deleteList(list: TodoList, event: Event) {
