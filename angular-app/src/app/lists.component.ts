@@ -14,11 +14,9 @@ import { map } from 'rxjs/operators';
   imports: [CommonModule, FormsModule, RouterModule],
   template: `
     <div class="lists-container">
-      <header class="app-header">
-        <a routerLink="/" class="back-link">← Back to Apps</a>
+      <header class="page-header">
         <h2>My Todo Lists</h2>
         <p>Create and manage your todo lists</p>
-        <button (click)="logout()" class="logout-btn">Sign Out</button>
       </header>
 
       <!-- Create New List Form -->
@@ -59,7 +57,7 @@ import { map } from 'rxjs/operators';
           <div class="list-meta">
             <span class="list-owner" *ngIf="isOwner(list) | async">Owner</span>
             <span class="list-shared" *ngIf="!(isOwner(list) | async)">Shared with you</span>
-            <span class="list-date">{{ list.updatedAt | date:'short' }}</span>
+            <span class="list-date">{{ getDate(list.updatedAt) | date:'short' }}</span>
           </div>
           <div *ngIf="list.sharedWith && list.sharedWith.length > 0" class="shared-with">
             <small>Shared with: {{ list.sharedWith.join(', ') }}</small>
@@ -96,47 +94,20 @@ import { map } from 'rxjs/operators';
       padding: 2rem;
     }
 
-    .app-header {
+    .page-header {
       text-align: center;
       margin-bottom: 2rem;
     }
 
-    .back-link {
-      display: inline-block;
-      color: #007bff;
-      text-decoration: none;
-      margin-bottom: 1rem;
-      font-weight: 500;
-    }
-
-    .back-link:hover {
-      text-decoration: underline;
-    }
-
-    .app-header h2 {
+    .page-header h2 {
       font-size: 2.5rem;
       color: #333;
       margin-bottom: 0.5rem;
     }
 
-    .app-header p {
+    .page-header p {
       color: #666;
       font-size: 1.1rem;
-    }
-
-    .logout-btn {
-      background: #dc3545;
-      color: white;
-      border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 0.9rem;
-      margin-top: 1rem;
-    }
-
-    .logout-btn:hover {
-      background: #c82333;
     }
 
     .create-list-section {
@@ -374,6 +345,13 @@ export class ListsComponent implements OnInit {
     return this.authService.user$.pipe(
       map(user => user?.uid === list.owner)
     );
+  }
+
+  getDate(timestamp: any): Date {
+    if (timestamp && typeof timestamp.toDate === 'function') {
+      return timestamp.toDate();
+    }
+    return new Date(); // Fallback to current date if timestamp is invalid or not a Date object
   }
 
   logout(): void {

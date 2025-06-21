@@ -1,8 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { AuthService } from './auth.service';
-import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-home',
@@ -23,14 +22,19 @@ import { map } from 'rxjs/operators';
           <a routerLink="/ip-lookup" class="app-link">Try it out</a>
         </div>
         
-        <div class="app-card">
+        <div class="app-card" *ngIf="user$ | async">
           <div class="app-icon">✅</div>
           <h3>Todo Lists</h3>
           <p>Manage your tasks with drag-and-drop reordering, cloud sync, and sharing</p>
-          <a *ngIf="user$ | async; else loginLink" routerLink="/lists" class="app-link">Get started</a>
-          <ng-template #loginLink>
-            <a routerLink="/login" class="app-link">Sign in to start</a>
-          </ng-template>
+          <a routerLink="/lists" class="app-link">Get started</a>
+        </div>
+        
+        <div class="app-card" *ngIf="!(user$ | async)">
+          <div class="app-icon">🔒</div>
+          <h3>Todo Lists</h3>
+          <p>Manage your tasks with drag-and-drop reordering, cloud sync, and sharing</p>
+          <p class="auth-required">Sign in required to access this feature</p>
+          <button (click)="goToLogin()" class="login-btn">Sign in to access</button>
         </div>
       </div>
     </div>
@@ -109,12 +113,41 @@ import { map } from 'rxjs/operators';
     .app-link:hover {
       background: #0056b3;
     }
+    
+    .auth-required {
+      color: #dc3545;
+      font-weight: 500;
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+    }
+    
+    .login-btn {
+      display: inline-block;
+      background: #007bff;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      margin-top: 1rem;
+    }
+    
+    .login-btn:hover {
+      background: #0056b3;
+    }
   `]
 })
 export class HomeComponent {
   user$;
 
-  constructor(private authService: AuthService) {
+  constructor(private authService: AuthService, private router: Router) {
     this.user$ = this.authService.user$;
+  }
+
+  goToLogin() {
+    this.router.navigate(['/login']);
   }
 } 

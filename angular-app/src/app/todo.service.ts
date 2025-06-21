@@ -53,13 +53,18 @@ export class TodoService {
       take(1),
       switchMap(user => {
         if (!user) {
+          console.error('User not logged in');
           return of(Promise.reject('User not logged in'));
         }
+        
+        console.log('Adding todo for user:', user.uid, 'to list:', listId);
         
         // Check if user has access to this list
         return from(this.todoListService.hasAccess(listId)).pipe(
           switchMap(hasAccess => {
+            console.log('User has access to list:', hasAccess);
             if (!hasAccess) {
+              console.error('Access denied to list:', listId);
               return of(Promise.reject('Access denied'));
             }
             
@@ -77,6 +82,8 @@ export class TodoService {
                   createdAt: now,
                   updatedAt: now
                 };
+                
+                console.log('Creating todo with data:', newTodo);
                 return from(addDoc(this.todosCollection, newTodo));
               })
             );

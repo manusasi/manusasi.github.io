@@ -32,7 +32,7 @@ export class TodoListService {
         
         const sharedListsQuery = query(
           this.listsCollection,
-          where('sharedWith', 'array-contains', user.uid),
+          where('sharedWith', 'array-contains', user.email),
           orderBy('updatedAt', 'desc')
         );
 
@@ -115,7 +115,8 @@ export class TodoListService {
     
     const list = listDoc.data() as TodoList;
     
-    // Add email to sharedWith (we'll store emails for now)
+    // For now, we'll store emails in sharedWith array
+    // In a production app, you'd want to look up the user by email and store their UID
     const updatedSharedWith = [...(list.sharedWith || []), userEmail];
     
     await updateDoc(listRef, {

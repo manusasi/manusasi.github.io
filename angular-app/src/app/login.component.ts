@@ -1,15 +1,14 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { AuthService } from './auth.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule],
   template: `
     <div class="login-container">
-      <a routerLink="/" class="back-link">← Back to Apps</a>
       <h2>Sign in to Todo List</h2>
       <p>Please sign in to access your personal todo list</p>
       <button (click)="login()" class="login-btn">
@@ -30,18 +29,6 @@ import { AuthService } from './auth.service';
       margin-left: auto;
       margin-right: auto;
       padding: 2rem;
-    }
-    
-    .back-link {
-      display: inline-block;
-      color: #007bff;
-      text-decoration: none;
-      margin-bottom: 2rem;
-      font-weight: 500;
-    }
-    
-    .back-link:hover {
-      text-decoration: underline;
     }
     
     .login-btn {

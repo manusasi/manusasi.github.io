@@ -1,11 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule, ActivatedRoute, Router } from '@angular/router';
+import { RouterModule, ActivatedRoute } from '@angular/router';
 import { Todo } from './todo.model';
 import { TodoService } from './todo.service';
 import { TodoListService } from './todo-list.service';
-import { AuthService } from './auth.service';
 import { Observable, switchMap } from 'rxjs';
 import { CdkDragDrop, moveItemInArray, DragDropModule } from '@angular/cdk/drag-drop';
 import { TodoList } from './todo-list.model';
@@ -29,9 +28,7 @@ export class TodoComponent implements OnInit {
   constructor(
     private todoService: TodoService, 
     private todoListService: TodoListService,
-    private authService: AuthService,
-    private route: ActivatedRoute,
-    private router: Router
+    private route: ActivatedRoute
   ) {
     this.todos$ = new Observable();
     this.currentList$ = new Observable();
@@ -104,11 +101,5 @@ export class TodoComponent implements OnInit {
     }
   }
 
-  logout(): void {
-    this.authService.signOut();
-  }
-
-  backToLists(): void {
-    this.router.navigate(['/lists']);
-  }
+  // Removed logout() and backToLists() methods as navigation is now handled by main app component
 } 

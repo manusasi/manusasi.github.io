@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
 import { LocationService } from './location.service';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-ip-lookup',
@@ -10,7 +10,7 @@ import { LocationService } from './location.service';
   template: `
     <div class="ip-lookup-container">
       <header class="app-header">
-        <a routerLink="/" class="back-link">← Back to Apps</a>
+        <a routerLink="/" class="back-link">← Back to Home</a>
         <h1>IP Lookup</h1>
         <p>Get detailed information about your current location</p>
       </header>
