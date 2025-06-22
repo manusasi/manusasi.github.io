@@ -23,26 +23,26 @@
       <div *ngIf="standings$ | async as standings; else loadingOrError">
         <div *ngIf="standings && standings.length > 0; else noData">
           <div class="overflow-x-auto">
-            <table class="w-full text-sm text-left">
+            <table class="w-full text-xs sm:text-sm text-left">
               <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                 <tr>
-                  <th scope="col" class="px-4 py-3 text-center">Pos</th>
-                  <th scope="col" class="px-4 py-3">Club</th>
-                  <th scope="col" class="px-4 py-3 text-center">P</th>
-                  <th scope="col" class="px-4 py-3 text-center">W</th>
-                  <th scope="col" class="px-4 py-3 text-center">D</th>
-                  <th scope="col" class="px-4 py-3 text-center">L</th>
-                  <th scope="col" class="px-4 py-3 text-center">GF</th>
-                  <th scope="col" class="px-4 py-3 text-center">GA</th>
-                  <th scope="col" class="px-4 py-3 text-center">GD</th>
-                  <th scope="col" class="px-4 py-3 text-center font-semibold">Pts</th>
+                  <th scope="col" class="px-2 sm:px-4 py-2 sm:py-3 text-center">Pos</th>
+                  <th scope="col" class="px-2 sm:px-4 py-2 sm:py-3">Team</th>
+                  <th scope="col" class="px-1 sm:px-4 py-2 sm:py-3 text-center">P</th>
+                  <th scope="col" class="px-1 sm:px-4 py-2 sm:py-3 text-center">W</th>
+                  <th scope="col" class="px-1 sm:px-4 py-2 sm:py-3 text-center">D</th>
+                  <th scope="col" class="px-1 sm:px-4 py-2 sm:py-3 text-center">L</th>
+                  <th scope="col" class="px-1 sm:px-4 py-2 sm:py-3 text-center">GF</th>
+                  <th scope="col" class="px-1 sm:px-4 py-2 sm:py-3 text-center">GA</th>
+                  <th scope="col" class="px-1 sm:px-4 py-2 sm:py-3 text-center">GD</th>
+                  <th scope="col" class="px-2 sm:px-4 py-2 sm:py-3 text-center font-semibold">Pts</th>
                 </tr>
               </thead>
               <tbody>
                 <tr *ngFor="let standing of standings; let i = index" 
                     class="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150">
-                  <td class="px-4 py-4 text-center font-medium">
-                    <span class="inline-flex items-center justify-center w-8 h-8 rounded-full text-sm font-semibold"
+                  <td class="px-2 sm:px-4 py-3 sm:py-4 text-center font-medium">
+                    <span class="inline-flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8 rounded-full text-xs sm:text-sm font-semibold"
                           [ngClass]="{
                             'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200': i === 0,
                             'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200': i === 1,
@@ -54,25 +54,33 @@
                       {{ standing.stats.rank }}
                     </span>
                   </td>
-                  <th scope="row" class="px-4 py-4 font-medium text-gray-900 dark:text-white">
+                  <th scope="row" class="px-2 sm:px-4 py-3 sm:py-4 font-medium text-gray-900 dark:text-white">
                     <div class="flex items-center">
                       <img [src]="standing.team.logo" 
                            [alt]="standing.team.name" 
-                           class="w-8 h-8 mr-3 rounded-full object-cover"
+                           class="w-6 h-6 sm:w-8 sm:h-8 mr-2 sm:mr-3 rounded-full object-cover"
                            (error)="onImageError($event)">
                       <div>
-                        <div class="font-semibold">{{ standing.team.name }}</div>
-                        <div class="text-xs text-gray-500 dark:text-gray-400">{{ standing.team.abbreviation }}</div>
+                        <!-- Show abbreviation on mobile, full name on desktop -->
+                        <div class="font-semibold">
+                          <span class="sm:hidden">{{ standing.team.abbreviation }}</span>
+                          <span class="hidden sm:inline">{{ standing.team.name }}</span>
+                        </div>
+                        <!-- Show full name as subtitle on mobile -->
+                        <div class="text-xs text-gray-500 dark:text-gray-400">
+                          <span class="sm:hidden">{{ standing.team.name }}</span>
+                          <span class="hidden sm:inline">{{ standing.team.abbreviation }}</span>
+                        </div>
                       </div>
                     </div>
                   </th>
-                  <td class="px-4 py-4 text-center">{{ standing.stats.gamesPlayed }}</td>
-                  <td class="px-4 py-4 text-center text-green-600 dark:text-green-400 font-medium">{{ standing.stats.wins }}</td>
-                  <td class="px-4 py-4 text-center text-gray-600 dark:text-gray-400">{{ standing.stats.ties }}</td>
-                  <td class="px-4 py-4 text-center text-red-600 dark:text-red-400 font-medium">{{ standing.stats.losses }}</td>
-                  <td class="px-4 py-4 text-center">{{ standing.stats.goalsFor }}</td>
-                  <td class="px-4 py-4 text-center">{{ standing.stats.goalsAgainst }}</td>
-                  <td class="px-4 py-4 text-center font-medium"
+                  <td class="px-1 sm:px-4 py-3 sm:py-4 text-center">{{ standing.stats.gamesPlayed }}</td>
+                  <td class="px-1 sm:px-4 py-3 sm:py-4 text-center text-green-600 dark:text-green-400 font-medium">{{ standing.stats.wins }}</td>
+                  <td class="px-1 sm:px-4 py-3 sm:py-4 text-center text-gray-600 dark:text-gray-400">{{ standing.stats.ties }}</td>
+                  <td class="px-1 sm:px-4 py-3 sm:py-4 text-center text-red-600 dark:text-red-400 font-medium">{{ standing.stats.losses }}</td>
+                  <td class="px-1 sm:px-4 py-3 sm:py-4 text-center">{{ standing.stats.goalsFor }}</td>
+                  <td class="px-1 sm:px-4 py-3 sm:py-4 text-center">{{ standing.stats.goalsAgainst }}</td>
+                  <td class="px-1 sm:px-4 py-3 sm:py-4 text-center font-medium"
                       [ngClass]="{
                         'text-green-600 dark:text-green-400': standing.stats.goalDifference > 0,
                         'text-red-600 dark:text-red-400': standing.stats.goalDifference < 0,
@@ -80,16 +88,16 @@
                       }">
                     {{ standing.stats.goalDifference > 0 ? '+' : '' }}{{ standing.stats.goalDifference }}
                   </td>
-                  <td class="px-4 py-4 text-center font-bold text-lg">{{ standing.stats.points }}</td>
+                  <td class="px-2 sm:px-4 py-3 sm:py-4 text-center font-bold text-sm sm:text-lg">{{ standing.stats.points }}</td>
                 </tr>
               </tbody>
             </table>
           </div>
           
           <!-- Legend -->
-          <div class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+          <div class="mt-4 sm:mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
             <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-3">Legend</h3>
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 text-xs">
               <div class="flex items-center">
                 <span class="w-3 h-3 bg-yellow-100 border border-yellow-300 rounded-full mr-2"></span>
                 <span class="text-gray-600 dark:text-gray-400">Champions League</span>
