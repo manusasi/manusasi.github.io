@@ -14,5 +14,6 @@ export const routes: Routes = [
   { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
   { path: 'lists', component: ListsComponent, canActivate: [AuthGuard] },
   { path: 'todo/:id', component: TodoComponent, canActivate: [AuthGuard] },
-  { path: 'todo', redirectTo: '/lists', pathMatch: 'full' }
+  { path: 'todo', redirectTo: '/lists', pathMatch: 'full' },
+  { path: 'quotes', loadComponent: () => import('./quotes.component').then(m => m.QuotesComponent) },
 ];

@@ -9,12 +9,15 @@ service cloud.firestore {
          resource.data.isPublic == true);
     }
     
-    // Allow users to read and write their own todos
+    // Allow users to read and write todos in lists they have access to
     match /todos/{todoId} {
       allow read, write: if request.auth != null && 
-        (resource == null || resource.data.owner == request.auth.uid || 
-         request.auth.token.email in resource.data.sharedWith || 
-         resource.data.isPublic == true);
+        (resource == null || 
+         // Check if user has access to the list this todo belongs to
+         exists(/databases/$(database)/documents/todoLists/$(resource.data.listId)) &&
+         (get(/databases/$(database)/documents/todoLists/$(resource.data.listId)).data.owner == request.auth.uid ||
+          request.auth.token.email in get(/databases/$(database)/documents/todoLists/$(resource.data.listId)).data.sharedWith ||
+          get(/databases/$(database)/documents/todoLists/$(resource.data.listId)).data.isPublic == true));
     }
     
     // Allow users to read and write their own user profiles

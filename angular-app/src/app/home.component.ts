@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from './auth.service';
+import { QuotesService, Quote } from './quotes.service';
 
 @Component({
   selector: 'app-home',
@@ -9,11 +10,20 @@ import { AuthService } from './auth.service';
   imports: [CommonModule],
   templateUrl: './home.component.html'
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
+  homeQuote: Quote | null = null;
+  quoteLoading = false;
+  quoteError: string | null = null;
+
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private quotesService: QuotesService
   ) {}
+
+  ngOnInit() {
+    this.refreshQuote();
+  }
 
   get user$() {
     return this.authService.user$;
@@ -27,7 +37,27 @@ export class HomeComponent {
     this.router.navigate(['/ip-lookup']);
   }
 
+  navigateToQuotes() {
+    this.router.navigate(['/quotes']);
+  }
+
   showProfile() {
     this.router.navigate(['/profile']);
+  }
+
+  refreshQuote() {
+    this.quoteLoading = true;
+    this.quoteError = null;
+    
+    this.quotesService.getRandomQuote().subscribe({
+      next: (quote) => {
+        this.homeQuote = quote;
+        this.quoteLoading = false;
+      },
+      error: (err) => {
+        this.quoteError = 'Failed to load quote.';
+        this.quoteLoading = false;
+      }
+    });
   }
 } 
