@@ -8,6 +8,7 @@ import { ProfileComponent } from './profile/profile.component';
 import { AuthGuard } from './auth.guard';
 import { FamilyTreeComponent } from './family-tree/family-tree.component';
 import { FamilyDetailComponent } from './family-detail/family-detail.component';
+import { PremierLeagueComponent } from './premier-league/premier-league.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -20,4 +21,5 @@ export const routes: Routes = [
   { path: 'quotes', loadComponent: () => import('./quotes.component').then(m => m.QuotesComponent) },
   { path: 'family-tree', component: FamilyTreeComponent, canActivate: [AuthGuard] },
   { path: 'family-tree/:familyId', component: FamilyDetailComponent, canActivate: [AuthGuard] },
+  { path: 'premier-league', component: PremierLeagueComponent }
 ];
