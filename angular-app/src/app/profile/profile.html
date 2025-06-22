@@ -1,16 +1,29 @@
 <div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-6 sm:py-8">
-  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Breadcrumb -->
+    <app-breadcrumb [items]="breadcrumbItems"></app-breadcrumb>
+
     <!-- Header -->
-    <div class="mb-6 sm:mb-8">
-      <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Profile</h1>
-      <p class="text-sm sm:text-base text-gray-600 dark:text-gray-300 mt-2">Manage your account information</p>
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8">
+      <div class="flex-1 min-w-0">
+        <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Profile</h1>
+        <p class="text-sm sm:text-base text-gray-600 dark:text-gray-300 mt-2">Manage your account information</p>
+      </div>
+      
+      <!-- Primary Action -->
+      <div class="mt-4 sm:mt-0 sm:ml-4">
+        <button (click)="logout()" 
+                class="btn-primary px-4 py-2 text-sm sm:text-base">
+          Sign Out
+        </button>
+      </div>
     </div>
 
     <!-- Profile Content -->
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-      <div class="p-4 sm:p-6">
-        <!-- User Info Section -->
-        <div class="mb-6 sm:mb-8">
+    <div class="space-y-6">
+      <!-- Account Information Card -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+        <div class="p-4 sm:p-6">
           <h2 class="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-4">Account Information</h2>
           
           <ng-container *ngIf="user$ | async as user">
@@ -49,21 +62,163 @@
             </div>
           </ng-container>
         </div>
+      </div>
 
-        <!-- Actions Section -->
-        <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
-          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Account Actions</h3>
+      <!-- Account Status & Security Card -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+        <div class="p-4 sm:p-6">
+          <h2 class="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-4">Account Status & Security</h2>
           
-          <div class="flex flex-col sm:flex-row gap-3 sm:gap-4">
-            <button (click)="logout()" 
-                    class="btn-secondary px-4 py-2 text-sm sm:text-base">
-              Sign Out
-            </button>
-            
-            <button (click)="goBack()" 
-                    class="btn-outline px-4 py-2 text-sm sm:text-base">
-              Back to Home
-            </button>
+          <ng-container *ngIf="user$ | async as user">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+              <!-- Email Verification Status -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email Verification</label>
+                <div class="flex items-center space-x-2">
+                  <div class="text-sm sm:text-base text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-700 px-3 py-2 rounded-md flex-1">
+                    {{ user?.emailVerified ? 'Verified' : 'Not Verified' }}
+                  </div>
+                  <div class="w-3 h-3 rounded-full" 
+                       [class]="user?.emailVerified ? 'bg-green-500' : 'bg-yellow-500'"></div>
+                </div>
+              </div>
+
+              <!-- Last Sign In -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Last Sign In</label>
+                <div class="text-sm sm:text-base text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-700 px-3 py-2 rounded-md">
+                  {{ user?.metadata?.lastSignInTime ? (user.metadata.lastSignInTime | date:'medium') : 'Not available' }}
+                </div>
+              </div>
+
+              <!-- Account Status -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Account Status</label>
+                <div class="flex items-center space-x-2">
+                  <div class="text-sm sm:text-base text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-700 px-3 py-2 rounded-md flex-1">
+                    Active
+                  </div>
+                  <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                </div>
+              </div>
+
+              <!-- Two-Factor Authentication -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Two-Factor Auth</label>
+                <div class="flex items-center space-x-2">
+                  <div class="text-sm sm:text-base text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-700 px-3 py-2 rounded-md flex-1">
+                    Not Enabled
+                  </div>
+                  <div class="w-3 h-3 rounded-full bg-gray-400"></div>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+
+      <!-- Usage Statistics Card -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+        <div class="p-4 sm:p-6">
+          <h2 class="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-4">Usage Statistics</h2>
+          
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            <!-- Total Todo Lists -->
+            <div class="text-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+              <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">{{ stats.todoLists || 0 }}</div>
+              <div class="text-sm text-gray-600 dark:text-gray-300">Todo Lists</div>
+            </div>
+
+            <!-- Total Family Trees -->
+            <div class="text-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+              <div class="text-2xl font-bold text-green-600 dark:text-green-400">{{ stats.familyTrees || 0 }}</div>
+              <div class="text-sm text-gray-600 dark:text-gray-300">Family Trees</div>
+            </div>
+
+            <!-- Last Activity -->
+            <div class="text-center p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+              <div class="text-sm font-semibold text-purple-600 dark:text-purple-400">
+                {{ stats.lastActivity || 'Today' }}
+              </div>
+              <div class="text-sm text-gray-600 dark:text-gray-300">Last Activity</div>
+            </div>
+
+            <!-- Account Age -->
+            <div class="text-center p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+              <div class="text-sm font-semibold text-orange-600 dark:text-orange-400">
+                {{ stats.accountAge || 'New' }}
+              </div>
+              <div class="text-sm text-gray-600 dark:text-gray-300">Account Age</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Preferences & Settings Card -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+        <div class="p-4 sm:p-6">
+          <h2 class="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-4">Preferences & Settings</h2>
+          
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+            <!-- Theme Preference -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Theme</label>
+              <div class="text-sm sm:text-base text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-700 px-3 py-2 rounded-md">
+                {{ preferences.theme || 'System Default' }}
+              </div>
+            </div>
+
+            <!-- Language -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Language</label>
+              <div class="text-sm sm:text-base text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-700 px-3 py-2 rounded-md">
+                {{ preferences.language || 'English' }}
+              </div>
+            </div>
+
+            <!-- Notifications -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Notifications</label>
+              <div class="text-sm sm:text-base text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-700 px-3 py-2 rounded-md">
+                {{ preferences.notifications || 'Enabled' }}
+              </div>
+            </div>
+
+            <!-- Privacy Level -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Privacy Level</label>
+              <div class="text-sm sm:text-base text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-700 px-3 py-2 rounded-md">
+                {{ preferences.privacy || 'Standard' }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Account Management Card -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+        <div class="p-4 sm:p-6">
+          <h2 class="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-4">Account Management</h2>
+          
+          <div class="space-y-4">
+            <!-- Account Actions -->
+            <div class="flex flex-col sm:flex-row gap-3 sm:gap-4">
+              <button (click)="exportData()" 
+                      class="btn-outline px-4 py-2 text-sm sm:text-base">
+                Export Data
+              </button>
+            </div>
+
+            <!-- Quick Links -->
+            <div class="border-t border-gray-200 dark:border-gray-700 pt-4">
+              <h3 class="text-md font-medium text-gray-900 dark:text-white mb-3">Quick Links</h3>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <a href="/lists" class="text-sm text-blue-600 dark:text-blue-400 hover:underline">View Todo Lists</a>
+                <a href="/family-tree" class="text-sm text-blue-600 dark:text-blue-400 hover:underline">View Family Trees</a>
+                <a href="/quotes" class="text-sm text-blue-600 dark:text-blue-400 hover:underline">Browse Quotes</a>
+                <a href="/premier-league" class="text-sm text-blue-600 dark:text-blue-400 hover:underline">Premier League</a>
+              </div>
+            </div>
           </div>
         </div>
       </div>

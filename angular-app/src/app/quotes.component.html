@@ -1,99 +1,105 @@
-<div class="min-h-screen bg-gray-50 dark:bg-gray-900 px-4 py-8">
-  <div class="max-w-6xl mx-auto">
-    <!-- Header -->
-    <div class="text-center mb-8">
-      <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2 flex items-center justify-center">
-        <svg class="w-8 h-8 mr-3 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17a4 4 0 01-4-4V7a4 4 0 014-4h10a4 4 0 014 4v6a4 4 0 01-4 4m-4 4v-4m0 0H7m4 0h6"/>
-        </svg>
-        Inspirational Quotes
-      </h1>
-      <p class="text-gray-600 dark:text-gray-300">Discover wisdom from great minds</p>
-    </div>
-
-    <!-- Controls -->
-    <div class="flex justify-center mb-6">
-      <button (click)="refreshQuotes()" 
-              [disabled]="loading"
-              class="btn-primary flex items-center space-x-2">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-        </svg>
-        <span>{{ loading ? 'Loading...' : 'Refresh Quotes' }}</span>
-      </button>
-    </div>
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900">
+  <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6">
+    <!-- Breadcrumb -->
+    <app-breadcrumb [items]="breadcrumbItems"></app-breadcrumb>
 
     <!-- Loading State -->
-    <div *ngIf="loading" class="flex items-center justify-center py-12">
-      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      <span class="ml-4 text-gray-600 dark:text-gray-300">Loading quotes...</span>
+    <div *ngIf="loading" class="card text-center">
+      <div class="flex items-center justify-center space-x-2">
+        <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-primary-600"></div>
+        <span class="text-sm text-gray-600 dark:text-gray-300">Loading quotes...</span>
+      </div>
     </div>
 
     <!-- Error State -->
-    <div *ngIf="error && !loading" class="text-center py-12">
-      <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 max-w-md mx-auto">
-        <p class="text-red-600 dark:text-red-400 mb-4">{{ error }}</p>
-        <button (click)="refreshQuotes()" class="btn-primary">
-          Try Again
-        </button>
+    <div *ngIf="error && !loading" class="card border-red-200 dark:border-red-700 bg-red-50 dark:bg-red-900/20">
+      <div class="flex items-center space-x-3">
+        <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <div>
+          <h3 class="text-base sm:text-lg font-medium text-red-800 dark:text-red-200">Error</h3>
+          <p class="text-sm text-red-600 dark:text-red-300">{{ error }}</p>
+        </div>
       </div>
     </div>
 
-    <!-- Quotes Grid -->
-    <div *ngIf="!loading && !error && displayedQuotes.length > 0" class="space-y-6">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div *ngFor="let quote of displayedQuotes" 
-             class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
-          <div class="flex flex-col h-full">
-            <!-- Quote Icon -->
-            <div class="flex justify-center mb-4">
-              <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
-                <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17a4 4 0 01-4-4V7a4 4 0 014-4h10a4 4 0 014 4v6a4 4 0 01-4 4m-4 4v-4m0 0H7m4 0h6"/>
-                </svg>
-              </div>
-            </div>
-            
-            <!-- Quote Text -->
-            <blockquote class="text-lg text-gray-800 dark:text-gray-200 italic text-center mb-4 flex-grow">
-              "{{ quote.q }}"
-            </blockquote>
-            
-            <!-- Author -->
-            <div class="text-center">
-              <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
-                — {{ quote.a }}
-              </p>
-            </div>
-          </div>
+    <!-- Quotes Content -->
+    <div *ngIf="!loading && !error" class="space-y-4 sm:space-y-6">
+      <!-- Header -->
+      <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between">
+        <div class="flex-1 min-w-0">
+          <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+            Inspirational Quotes
+          </h1>
+          <p class="text-sm text-gray-600 dark:text-gray-300 mt-1 sm:mt-2">Discover wisdom from great minds</p>
+        </div>
+        <div class="flex items-center space-x-2 mt-4 sm:mt-0 sm:ml-4">
+          <button (click)="refreshQuotes()" 
+                  [disabled]="loading"
+                  class="btn-primary text-sm flex items-center space-x-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+            <span>{{ loading ? 'Loading...' : 'Refresh Quotes' }}</span>
+          </button>
         </div>
       </div>
 
-      <!-- Show More Button -->
-      <div *ngIf="hasMoreQuotes" class="text-center pt-6">
-        <button (click)="showMore()" 
-                class="btn-secondary flex items-center space-x-2 mx-auto">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-          </svg>
-          <span>Show More Quotes</span>
-        </button>
-      </div>
+      <!-- Quotes Grid -->
+      <div *ngIf="displayedQuotes.length > 0" class="space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          <div *ngFor="let quote of displayedQuotes" 
+               class="card hover:shadow-xl transition-shadow duration-300">
+            <div class="flex flex-col h-full">
+              <!-- Quote Icon -->
+              <div class="flex justify-center mb-4">
+                <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                  <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17a4 4 0 01-4-4V7a4 4 0 014-4h10a4 4 0 014 4v6a4 4 0 01-4 4m-4 4v-4m0 0H7m4 0h6"/>
+                  </svg>
+                </div>
+              </div>
+              
+              <!-- Quote Text -->
+              <blockquote class="text-lg text-gray-800 dark:text-gray-200 italic text-center mb-4 flex-grow">
+                "{{ quote.q }}"
+              </blockquote>
+              
+              <!-- Author -->
+              <div class="text-center">
+                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
+                  — {{ quote.a }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
 
-      <!-- End Message -->
-      <div *ngIf="!hasMoreQuotes && quotes.length > 0" class="text-center py-8">
-        <p class="text-gray-500 dark:text-gray-400">
-          You've seen all {{ quotes.length }} quotes! 
-          <button (click)="refreshQuotes()" class="text-blue-600 dark:text-blue-400 hover:underline ml-1">
-            Refresh for more
+        <!-- Show More Button -->
+        <div *ngIf="hasMoreQuotes" class="text-center pt-6">
+          <button (click)="showMore()" 
+                  class="btn-secondary flex items-center space-x-2 mx-auto">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+            <span>Show More Quotes</span>
           </button>
-        </p>
-      </div>
-    </div>
+        </div>
 
-    <!-- Empty State -->
-    <div *ngIf="!loading && !error && displayedQuotes.length === 0" class="text-center py-12">
-      <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-8 max-w-md mx-auto">
+        <!-- End Message -->
+        <div *ngIf="!hasMoreQuotes && quotes.length > 0" class="text-center py-8">
+          <p class="text-gray-500 dark:text-gray-400">
+            You've seen all {{ quotes.length }} quotes! 
+            <button (click)="refreshQuotes()" class="text-blue-600 dark:text-blue-400 hover:underline ml-1">
+              Refresh for more
+            </button>
+          </p>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="displayedQuotes.length === 0" class="card text-center">
         <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17a4 4 0 01-4-4V7a4 4 0 014-4h10a4 4 0 014 4v6a4 4 0 01-4 4m-4 4v-4m0 0H7m4 0h6"/>
         </svg>

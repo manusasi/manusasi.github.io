@@ -1,14 +1,7 @@
 <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
-  <div class="max-w-4xl mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6">
-    <!-- Header -->
-    <div class="text-center mb-4 sm:mb-6">
-      <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-4">
-        IP Address Lookup
-      </h1>
-      <p class="text-sm sm:text-base text-gray-600 dark:text-gray-300">
-        Get detailed information about your current IP address and location
-      </p>
-    </div>
+  <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6">
+    <!-- Breadcrumb -->
+    <app-breadcrumb [items]="breadcrumbItems"></app-breadcrumb>
 
     <!-- Loading State -->
     <div *ngIf="isLoading" class="card text-center">
@@ -33,6 +26,27 @@
 
     <!-- IP Information -->
     <div *ngIf="ipInfo && !isLoading" class="space-y-4 sm:space-y-6">
+      <!-- Header -->
+      <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between">
+        <div class="flex-1 min-w-0">
+          <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">IP Address Lookup</h1>
+          <p class="text-sm text-gray-600 dark:text-gray-300 mt-1 sm:mt-2">Get detailed information about your current IP address and location</p>
+        </div>
+        <div class="flex items-center space-x-2 mt-4 sm:mt-0 sm:ml-4">
+          <button (click)="refreshIpInfo()" 
+                  class="btn-primary text-sm flex items-center space-x-2"
+                  [disabled]="isLoading">
+            <svg *ngIf="!isLoading" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+            <svg *ngIf="isLoading" class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+            <span>{{ isLoading ? 'Refreshing...' : 'Refresh' }}</span>
+          </button>
+        </div>
+      </div>
+
       <!-- Main IP Card -->
       <div class="card">
         <div class="flex items-center space-x-3 sm:space-x-4 mb-4 sm:mb-6">
@@ -140,21 +154,6 @@
             </div>
           </div>
         </div>
-      </div>
-
-      <!-- Refresh Button -->
-      <div class="text-center">
-        <button (click)="refreshIpInfo()" 
-                class="btn-primary"
-                [disabled]="isLoading">
-          <svg *ngIf="!isLoading" class="w-4 h-4 mr-1.5 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-          </svg>
-          <svg *ngIf="isLoading" class="w-4 h-4 mr-1.5 sm:mr-2 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-          </svg>
-          {{ isLoading ? 'Refreshing...' : 'Refresh IP Info' }}
-        </button>
       </div>
     </div>
   </div>

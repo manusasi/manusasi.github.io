@@ -8,11 +8,12 @@ import { AuthService } from './auth.service';
 import { Observable, take } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ListEditShareModalComponent } from './list-edit-share-modal.component';
+import { BreadcrumbComponent } from './breadcrumb.component';
 
 @Component({
   selector: 'app-lists',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, ListEditShareModalComponent],
+  imports: [CommonModule, FormsModule, RouterModule, ListEditShareModalComponent, BreadcrumbComponent],
   templateUrl: './lists.component.html'
 })
 export class ListsComponent implements OnInit {
@@ -33,6 +34,10 @@ export class ListsComponent implements OnInit {
   showEditShareModal = false;
   modalMode: 'edit' | 'share' = 'edit';
   modalList: TodoList | null = null;
+  breadcrumbItems = [
+    { label: 'Home', route: '/' },
+    { label: 'Todo Lists', route: undefined }
+  ];
 
   constructor(
     private todoListService: TodoListService,

@@ -5,12 +5,13 @@ import { Family } from './family-tree.model';
 import { Observable } from 'rxjs';
 import { FamilyShareModalComponent } from '../family-share-modal/family-share-modal.component';
 import { CreateFamilyModalComponent } from '../create-family-modal/create-family-modal.component';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
+import { BreadcrumbComponent } from '../breadcrumb.component';
 
 @Component({
   selector: 'app-family-tree',
   standalone: true,
-  imports: [CommonModule, FamilyShareModalComponent, CreateFamilyModalComponent, RouterLink],
+  imports: [CommonModule, FamilyShareModalComponent, CreateFamilyModalComponent, RouterLink, BreadcrumbComponent],
   templateUrl: './family-tree.component.html',
   styleUrl: './family-tree.component.css'
 })
@@ -21,9 +22,21 @@ export class FamilyTreeComponent {
   selectedFamily: Family | null = null;
   
   isCreateModalOpen = false;
+  breadcrumbItems = [
+    { label: 'Home', route: '/' },
+    { label: 'Family Trees', route: undefined }
+  ];
 
-  constructor(private familyTreeService: FamilyTreeService) {
+  constructor(
+    private familyTreeService: FamilyTreeService,
+    private router: Router
+  ) {
     this.families$ = this.familyTreeService.getFamilies();
+  }
+
+  // Navigation
+  openFamily(family: Family) {
+    this.router.navigate(['/family-tree', family.id]);
   }
 
   // Create Modal

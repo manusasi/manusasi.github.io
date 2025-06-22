@@ -2,11 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { QuotesService, Quote } from './quotes.service';
 import { HttpClientModule } from '@angular/common/http';
+import { BreadcrumbComponent } from './breadcrumb.component';
 
 @Component({
   selector: 'app-quotes',
   standalone: true,
-  imports: [CommonModule, HttpClientModule],
+  imports: [CommonModule, HttpClientModule, BreadcrumbComponent],
   templateUrl: './quotes.component.html',
 })
 export class QuotesComponent implements OnInit {
@@ -15,8 +16,12 @@ export class QuotesComponent implements OnInit {
   loading = false;
   error: string | null = null;
   currentPage = 1;
-  quotesPerPage = 5;
+  quotesPerPage = 6;
   hasMoreQuotes = false;
+  breadcrumbItems = [
+    { label: 'Home', route: '/' },
+    { label: 'Quotes', route: undefined }
+  ];
 
   constructor(private quotesService: QuotesService) {}
 

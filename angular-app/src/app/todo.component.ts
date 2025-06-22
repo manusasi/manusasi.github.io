@@ -9,11 +9,12 @@ import { Todo } from './todo.model';
 import { take } from 'rxjs';
 import { ListEditShareModalComponent } from './list-edit-share-modal.component';
 import { AuthService } from './auth.service';
+import { BreadcrumbComponent, BreadcrumbItem } from './breadcrumb.component';
 
 @Component({
   selector: 'app-todo',
   standalone: true,
-  imports: [CommonModule, FormsModule, ListEditShareModalComponent],
+  imports: [CommonModule, FormsModule, ListEditShareModalComponent, BreadcrumbComponent],
   templateUrl: './todo.component.html',
 })
 export class TodoComponent implements OnInit {
@@ -26,6 +27,7 @@ export class TodoComponent implements OnInit {
   showEditShareModal = false;
   modalMode: 'edit' | 'share' = 'edit';
   ownerName: string = '';
+  breadcrumbItems: BreadcrumbItem[] = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -63,6 +65,9 @@ export class TodoComponent implements OnInit {
             }
             
             console.log('Found todo list:', this.todoList);
+            
+            // Update breadcrumbs
+            this.updateBreadcrumbs(this.todoList);
             
             // Get the owner name
             this.getOwnerName(this.todoList.owner);
@@ -120,6 +125,25 @@ export class TodoComponent implements OnInit {
       this.error = 'No list ID provided.';
       this.isLoading = false;
     }
+  }
+
+  updateBreadcrumbs(todoList: TodoList): void {
+    this.breadcrumbItems = [
+      {
+        label: 'Home',
+        route: '/',
+        icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6'
+      },
+      {
+        label: 'Lists',
+        route: '/lists',
+        icon: 'M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01'
+      },
+      {
+        label: todoList.title,
+        icon: 'M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01'
+      }
+    ];
   }
 
   get completedCount(): number {

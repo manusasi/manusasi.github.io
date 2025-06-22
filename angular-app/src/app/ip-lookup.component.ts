@@ -2,17 +2,22 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LocationService } from './location.service';
 import { RouterModule } from '@angular/router';
+import { BreadcrumbComponent } from './breadcrumb.component';
 
 @Component({
   selector: 'app-ip-lookup',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, BreadcrumbComponent],
   templateUrl: './ip-lookup.component.html'
 })
 export class IpLookupComponent implements OnInit {
   ipInfo: any = null;
   isLoading = false;
   error: string | null = null;
+  breadcrumbItems = [
+    { label: 'Home', route: '/' },
+    { label: 'IP Lookup', route: undefined }
+  ];
 
   constructor(private locationService: LocationService) {}
 
