@@ -102,10 +102,63 @@
         </div>
       </div>
 
-      <!-- Placeholder for member list and tree visualization -->
+      <!-- Family Members Section -->
       <div class="mt-8">
-        <h2 class="text-2xl font-semibold text-gray-900 dark:text-white">Family Members</h2>
-        <p class="mt-4 text-gray-500">Member list and tree visualization will be here.</p>
+        <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Family Members</h2>
+        
+        <!-- Add Member Form -->
+        <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg mb-6">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Add New Member</h3>
+          <form [formGroup]="addMemberForm" (ngSubmit)="addFamilyMember()">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="form-field">
+                <label for="firstName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">First Name</label>
+                <input type="text" id="firstName" formControlName="firstName" class="form-input">
+              </div>
+              <div class="form-field">
+                <label for="lastName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Last Name</label>
+                <input type="text" id="lastName" formControlName="lastName" class="form-input">
+              </div>
+              <div class="form-field">
+                <label for="gender" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Gender</label>
+                <select id="gender" formControlName="gender" class="form-input">
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <label for="dateOfBirth" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Date of Birth</label>
+                <input type="date" id="dateOfBirth" formControlName="dateOfBirth" class="form-input">
+              </div>
+            </div>
+            <div class="mt-4">
+              <button type="submit" [disabled]="!addMemberForm.valid"
+                      class="px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 border border-transparent rounded-md shadow-sm focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed">
+                Add Member
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Member list -->
+        <div *ngIf="members$ | async as members; else loadingMembers">
+          <div *ngIf="members.length > 0; else noMembers">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div *ngFor="let member of members" class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+                <h4 class="font-semibold text-lg text-gray-900 dark:text-white">{{ member.firstName }} {{ member.lastName }}</h4>
+                <p class="text-sm text-gray-600 dark:text-gray-400">{{ member.gender | titlecase }}</p>
+                <p class="text-sm text-gray-600 dark:text-gray-400">Born: {{ member.dateOfBirth.toDate() | date:'longDate' }}</p>
+              </div>
+            </div>
+          </div>
+          <ng-template #noMembers>
+            <p class="mt-4 text-gray-500">No members have been added to this family yet.</p>
+          </ng-template>
+        </div>
+        <ng-template #loadingMembers>
+          <p class="mt-4 text-gray-500">Loading members...</p>
+        </ng-template>
       </div>
 
     </div>

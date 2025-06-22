@@ -90,8 +90,29 @@ export class FamilyTreeService {
     return docData(familyDocRef, { idField: 'id' }) as Observable<Family | undefined>;
   }
 
+  getFamilyMembers(familyId: string): Observable<FamilyMember[]> {
+    const memberCollectionRef = collection(this.firestore, 'families', familyId, 'members');
+    const q = query(memberCollectionRef); // Add ordering later if needed, e.g., orderBy('dateOfBirth')
+    return collectionData(q, { idField: 'id' }) as Observable<FamilyMember[]>;
+  }
+
   // Methods for family members
-  async addMember(member: Partial<FamilyMember>) {
-    // ... existing code ...
+  async addFamilyMember(familyId: string, memberData: Partial<FamilyMember>): Promise<void> {
+    const user = await firstValueFrom(this.auth.user$);
+    if (!user) {
+      throw new Error('User not logged in');
+    }
+
+    const memberCollectionRef = collection(this.firestore, 'families', familyId, 'members');
+    
+    const newMember: Omit<FamilyMember, 'id'> = {
+      ...memberData,
+      familyId: familyId,
+      status: 'approved',
+      createdBy: user.uid,
+      createdAt: serverTimestamp(),
+    } as Omit<FamilyMember, 'id'>;
+
+    await addDoc(memberCollectionRef, newMember);
   }
 }

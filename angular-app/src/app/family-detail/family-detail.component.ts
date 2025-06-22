@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FamilyTreeService } from '../family-tree/family-tree.service';
-import { Family } from '../family-tree/family-tree.model';
+import { Family, FamilyMember } from '../family-tree/family-tree.model';
 import { Observable, of } from 'rxjs';
 import { switchMap, tap } from 'rxjs/operators';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../auth.service';
-import { RouterLink } from '@angular/router';
+import { Timestamp } from '@angular/fire/firestore';
 
 @Component({
   selector: 'app-family-detail',
@@ -18,11 +18,13 @@ import { RouterLink } from '@angular/router';
 })
 export class FamilyDetailComponent implements OnInit {
   family$: Observable<Family | undefined> | undefined;
+  members$: Observable<FamilyMember[]> | undefined;
   familyId: string | null = null;
   
   isEditing = false;
   editForm: FormGroup;
   addShareUserForm: FormGroup;
+  addMemberForm: FormGroup;
 
   private currentFamily: Family | undefined;
 
@@ -40,6 +42,13 @@ export class FamilyDetailComponent implements OnInit {
     this.addShareUserForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]]
     });
+
+    this.addMemberForm = this.fb.group({
+      firstName: ['', Validators.required],
+      lastName: ['', Validators.required],
+      gender: ['male', Validators.required],
+      dateOfBirth: ['', Validators.required],
+    });
   }
 
   ngOnInit(): void {
@@ -48,6 +57,7 @@ export class FamilyDetailComponent implements OnInit {
         const familyId = params.get('familyId');
         this.familyId = familyId;
         if (familyId) {
+          this.members$ = this.familyTreeService.getFamilyMembers(familyId);
           return this.familyTreeService.getFamilyById(familyId);
         }
         return of(undefined);
@@ -82,6 +92,20 @@ export class FamilyDetailComponent implements OnInit {
     if (this.editForm.valid && this.familyId) {
       await this.familyTreeService.updateFamily(this.familyId, this.editForm.value);
       this.isEditing = false;
+    }
+  }
+
+  async addFamilyMember(): Promise<void> {
+    if (this.addMemberForm.valid && this.familyId) {
+      try {
+        const memberData = this.addMemberForm.value;
+        const date = new Date(memberData.dateOfBirth);
+        memberData.dateOfBirth = Timestamp.fromDate(date);
+        await this.familyTreeService.addFamilyMember(this.familyId, memberData);
+        this.addMemberForm.reset({ gender: 'male' });
+      } catch (error) {
+        console.error('Error adding family member:', error);
+      }
     }
   }
 
