@@ -30,14 +30,28 @@ try {
     process.exit(1);
   }
 
-  // Now, move files to the root
+  // Now, copy files to the root
   const rootPath = path.join(__dirname, '..');
+  const distPath = path.join(__dirname, 'dist', 'angular-app');
+  
+  // Copy all files from browser directory
   fs.readdirSync(browserPath).forEach(file => {
     const srcPath = path.join(browserPath, file);
     const destPath = path.join(rootPath, file);
-    fs.moveSync(srcPath, destPath, { overwrite: true });
+    fs.copySync(srcPath, destPath, { overwrite: true });
   });
-  console.log('Successfully moved build files to the root directory.');
+  console.log('Successfully copied build files from browser directory to the root directory.');
+
+  // Copy additional files from dist root
+  const additionalFiles = ['3rdpartylicenses.txt', 'prerendered-routes.json'];
+  additionalFiles.forEach(file => {
+    const srcPath = path.join(distPath, file);
+    const destPath = path.join(rootPath, file);
+    if (fs.existsSync(srcPath)) {
+      fs.copySync(srcPath, destPath, { overwrite: true });
+      console.log(`Successfully copied ${file} to the root directory.`);
+    }
+  });
 
 } catch (error) {
   console.error('Error during post-build script:', error);
