@@ -41,6 +41,11 @@ export class HomeComponent implements OnInit {
     this.router.navigate(['/quotes']);
   }
 
+  // Navigate to the Family Tree page
+  navigateToFamilyTree() {
+    this.router.navigate(['/family-tree']);
+  }
+
   showProfile() {
     this.router.navigate(['/profile']);
   }

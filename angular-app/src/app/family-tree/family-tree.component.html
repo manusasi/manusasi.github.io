@@ -1,0 +1,49 @@
+<div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Family Trees</h1>
+    <button (click)="openCreateModal()"
+            class="px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 border border-transparent rounded-md shadow-sm focus:outline-none">
+      Create Family
+    </button>
+  </div>
+
+  <!-- Family List -->
+  <div class="mt-2">
+    <div *ngIf="families$ | async as families; else loading">
+      <div *ngIf="families.length > 0; else noFamilies" class="space-y-4">
+        <a *ngFor="let family of families"
+           [routerLink]="['/family-tree', family.id]"
+           class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 flex justify-between items-center hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
+          <div>
+            <h3 class="font-semibold text-gray-900 dark:text-white">{{ family.name }}</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400">{{ family.description }}</p>
+          </div>
+          <div>
+            <button (click)="openShareModal(family)"
+                    class="text-sm text-primary-600 dark:text-primary-400 hover:underline">Share
+            </button>
+          </div>
+        </a>
+      </div>
+      <ng-template #noFamilies>
+        <p class="text-gray-600 dark:text-gray-400">You are not a part of any family yet. Create one to get started.</p>
+      </ng-template>
+    </div>
+    <ng-template #loading>
+      <p class="text-gray-600 dark:text-gray-400">Loading families...</p>
+    </ng-template>
+  </div>
+</div>
+
+<app-create-family-modal
+  *ngIf="isCreateModalOpen"
+  (close)="closeCreateModal()"
+  (create)="handleCreateFamily($event)">
+</app-create-family-modal>
+
+<app-family-share-modal
+  *ngIf="isShareModalOpen"
+  [family]="selectedFamily"
+  (close)="closeShareModal()"
+  (share)="handleShare($event)">
+</app-family-share-modal>

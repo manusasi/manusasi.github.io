@@ -1,5 +1,5 @@
 const { execSync } = require('child_process');
-const fs = require('fs');
+const fs = require('fs-extra');
 const path = require('path');
 
 try {
@@ -8,7 +8,8 @@ try {
   console.log(`Git commit hash: ${hash}`);
 
   // Path to the index.html file
-  const indexPath = path.join(__dirname, 'dist', 'angular-app', 'browser', 'index.html');
+  const browserPath = path.join(__dirname, 'dist', 'angular-app', 'browser');
+  const indexPath = path.join(browserPath, 'index.html');
 
   if (fs.existsSync(indexPath)) {
     // Read the index.html file
@@ -28,6 +29,16 @@ try {
     console.error(`Error: index.html not found at ${indexPath}`);
     process.exit(1);
   }
+
+  // Now, move files to the root
+  const rootPath = path.join(__dirname, '..');
+  fs.readdirSync(browserPath).forEach(file => {
+    const srcPath = path.join(browserPath, file);
+    const destPath = path.join(rootPath, file);
+    fs.moveSync(srcPath, destPath, { overwrite: true });
+  });
+  console.log('Successfully moved build files to the root directory.');
+
 } catch (error) {
   console.error('Error during post-build script:', error);
   process.exit(1);

@@ -1,0 +1,119 @@
+<div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+  <div class="mb-6">
+    <a routerLink="/family-tree" class="inline-flex items-center text-sm font-semibold text-primary-600 hover:text-primary-800 dark:text-primary-400 dark:hover:text-primary-300">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+      </svg>
+      Back to Family List
+    </a>
+  </div>
+
+  <div *ngIf="family$ | async as family; else loading">
+    <div *ngIf="family; else notFound">
+
+      <div class="flex justify-between items-start mb-8">
+        <div class="flex-grow">
+          <!-- Display Mode -->
+          <ng-container *ngIf="!isEditing">
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ family.name }}</h1>
+            <p class="mt-2 text-lg text-gray-600 dark:text-gray-400" *ngIf="family.description">{{ family.description }}</p>
+          </ng-container>
+
+          <!-- Edit Mode -->
+          <ng-container *ngIf="isEditing">
+            <form [formGroup]="editForm" id="editFamilyForm" (ngSubmit)="saveChanges()">
+              <div class="mb-4">
+                <label for="familyName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Family Name</label>
+                <input type="text" id="familyName" formControlName="name"
+                       class="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm text-gray-900 dark:text-white">
+              </div>
+              <div>
+                <label for="familyDescription" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
+                <textarea id="familyDescription" formControlName="description" rows="3"
+                          class="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm text-gray-900 dark:text-white"></textarea>
+              </div>
+            </form>
+          </ng-container>
+        </div>
+
+        <div class="ml-4 flex-shrink-0">
+          <ng-container *ngIf="!isEditing && family.owner === (auth.user$ | async)?.uid">
+            <button (click)="startEditing()"
+                    class="px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 border border-transparent rounded-md shadow-sm focus:outline-none">
+              Edit
+            </button>
+          </ng-container>
+          <ng-container *ngIf="isEditing">
+            <div class="flex space-x-2">
+              <button type="submit" form="editFamilyForm" [disabled]="!editForm.valid || !editForm.dirty"
+                      class="px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 border border-transparent rounded-md shadow-sm focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed">
+                Save
+              </button>
+              <button type="button" (click)="cancelEditing()"
+                      class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-500 rounded-md shadow-sm hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none">
+                Cancel
+              </button>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+
+      <!-- Shared Users Section -->
+      <div class="mt-8">
+        <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Shared With</h2>
+        
+        <!-- Display Mode -->
+        <div *ngIf="!isEditing" class="space-y-2">
+          <div *ngIf="family.sharedWith && family.sharedWith.length > 0; else noSharedUsers">
+            <span *ngFor="let email of family.sharedWith" class="inline-block bg-gray-200 dark:bg-gray-700 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 dark:text-gray-200 mr-2 mb-2">
+              {{ email }}
+            </span>
+          </div>
+          <ng-template #noSharedUsers>
+            <p class="text-gray-500">This family isn't shared with anyone.</p>
+          </ng-template>
+        </div>
+
+        <!-- Edit Mode -->
+        <div *ngIf="isEditing" class="space-y-4">
+          <!-- List of current users -->
+          <div *ngIf="family.sharedWith && family.sharedWith.length > 0">
+            <div *ngFor="let email of family.sharedWith" class="flex items-center justify-between bg-gray-100 dark:bg-gray-700 p-2 rounded-md">
+              <span class="text-sm text-gray-900 dark:text-gray-200">{{ email }}</span>
+              <button (click)="removeSharedUser(email)" class="text-sm text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 font-semibold">
+                Remove
+              </button>
+            </div>
+          </div>
+          
+          <!-- Form to add new user -->
+          <form [formGroup]="addShareUserForm" (ngSubmit)="addSharedUser()" class="flex items-end space-x-2">
+            <div class="flex-grow">
+              <label for="shareEmail" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Add user by email</label>
+              <input type="email" id="shareEmail" formControlName="email"
+                     class="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm text-gray-900 dark:text-white"
+                     placeholder="user@example.com">
+            </div>
+            <button type="submit" [disabled]="!addShareUserForm.valid"
+                    class="px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 border border-transparent rounded-md shadow-sm focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed">
+              Add
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Placeholder for member list and tree visualization -->
+      <div class="mt-8">
+        <h2 class="text-2xl font-semibold text-gray-900 dark:text-white">Family Members</h2>
+        <p class="mt-4 text-gray-500">Member list and tree visualization will be here.</p>
+      </div>
+
+    </div>
+    <ng-template #notFound>
+      <p class="text-center text-gray-500">Family not found.</p>
+    </ng-template>
+  </div>
+  <ng-template #loading>
+    <p class="text-center text-gray-500">Loading family details...</p>
+  </ng-template>
+</div>
