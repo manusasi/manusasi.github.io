@@ -1,0 +1,82 @@
+[debug] [2025-06-22T17:39:51.927Z] ----------------------------------------------------------------------
+[debug] [2025-06-22T17:39:51.928Z] Command:       /opt/homebrew/Cellar/node/24.2.0/bin/node /Users/manu/code/manusasi.github.io/manusasi.github.io/node_modules/.bin/firebase login
+[debug] [2025-06-22T17:39:51.928Z] CLI Version:   14.8.0
+[debug] [2025-06-22T17:39:51.928Z] Platform:      darwin
+[debug] [2025-06-22T17:39:51.928Z] Node Version:  v24.2.0
+[debug] [2025-06-22T17:39:51.928Z] Time:          Sun Jun 22 2025 13:39:51 GMT-0400 (Eastern Daylight Time)
+[debug] [2025-06-22T17:39:51.928Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-06-22T17:39:51.929Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[info] i  Firebase CLI integrates with Gemini in Firebase API to provide assistant features. Learn more about using Gemini in Firebase and how we train our models: https://firebase.google.com/docs/gemini-in-firebase/set-up-gemini#required-permissions 
+[debug] [2025-06-22T17:39:52.040Z] <<< [apiv2][status] GET https://firebase-public.firebaseio.com/cli.json 200
+[debug] [2025-06-22T17:39:52.041Z] <<< [apiv2][body] GET https://firebase-public.firebaseio.com/cli.json {"cloudBuildErrorAfter":1594252800000,"cloudBuildWarnAfter":1590019200000,"defaultNode10After":1594252800000,"minVersion":"3.0.5","node8DeploysDisabledAfter":1613390400000,"node8RuntimeDisabledAfter":1615809600000,"node8WarnAfter":1600128000000}
+[warn] ⚠  Unable to fetch the CLI MOTD and remote config. This is not a fatal error, but may indicate an issue with your network connection. 
+[debug] [2025-06-22T17:39:52.041Z] Failed to fetch MOTD Error: EACCES: permission denied, mkdir '/Users/manu/.config/configstore'
+You don't have access to this file.
+
+[debug] [2025-06-22T17:40:41.470Z] Error: EACCES: permission denied, mkdir '/Users/manu/.config/configstore'
+You don't have access to this file.
+
+    at Object.mkdirSync (node:fs:1342:26)
+    at module.exports.sync (/Users/manu/code/manusasi.github.io/manusasi.github.io/node_modules/make-dir/index.js:114:6)
+    at set all (/Users/manu/code/manusasi.github.io/manusasi.github.io/node_modules/configstore/index.js:59:12)
+    at Configstore.set (/Users/manu/code/manusasi.github.io/manusasi.github.io/node_modules/configstore/index.js:91:12)
+    at Command.actionFn (/Users/manu/code/manusasi.github.io/manusasi.github.io/node_modules/firebase-tools/lib/commands/login.js:32:35)
+[error] 
+[error] Error: An unexpected error has occurred.
+[debug] [2025-06-22T17:40:41.735Z] Error: EACCES: permission denied, mkdir '/Users/manu/.config/configstore'
+You don't have access to this file.
+
+    at Object.mkdirSync (node:fs:1342:26)
+    at module.exports.sync (/Users/manu/code/manusasi.github.io/manusasi.github.io/node_modules/make-dir/index.js:114:6)
+    at set all (/Users/manu/code/manusasi.github.io/manusasi.github.io/node_modules/configstore/index.js:59:12)
+    at Configstore.set (/Users/manu/code/manusasi.github.io/manusasi.github.io/node_modules/configstore/index.js:91:12)
+    at process.<anonymous> (/Users/manu/code/manusasi.github.io/manusasi.github.io/node_modules/firebase-tools/lib/bin/cli.js:62:39)
+    at process.emit (node:events:519:35)
+    at process.exit (node:internal/process/per_thread:236:15)
+    at Timeout._onTimeout (/Users/manu/code/manusasi.github.io/manusasi.github.io/node_modules/firebase-tools/lib/errorOut.js:20:17)
+    at listOnTimeout (node:internal/timers:608:17)
+    at process.processTimers (node:internal/timers:543:7)
+[error] 
+[error] Error: An unexpected error has occurred.
+[debug] [2025-06-22T17:40:46.937Z] ----------------------------------------------------------------------
+[debug] [2025-06-22T17:40:46.938Z] Command:       /opt/homebrew/Cellar/node/24.2.0/bin/node /Users/manu/code/manusasi.github.io/manusasi.github.io/node_modules/.bin/firebase login --no-localhost
+[debug] [2025-06-22T17:40:46.938Z] CLI Version:   14.8.0
+[debug] [2025-06-22T17:40:46.938Z] Platform:      darwin
+[debug] [2025-06-22T17:40:46.938Z] Node Version:  v24.2.0
+[debug] [2025-06-22T17:40:46.938Z] Time:          Sun Jun 22 2025 13:40:46 GMT-0400 (Eastern Daylight Time)
+[debug] [2025-06-22T17:40:46.939Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-06-22T17:40:46.939Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[info] i  Firebase CLI integrates with Gemini in Firebase API to provide assistant features. Learn more about using Gemini in Firebase and how we train our models: https://firebase.google.com/docs/gemini-in-firebase/set-up-gemini#required-permissions 
+[debug] [2025-06-22T17:40:47.089Z] <<< [apiv2][status] GET https://firebase-public.firebaseio.com/cli.json 200
+[debug] [2025-06-22T17:40:47.089Z] <<< [apiv2][body] GET https://firebase-public.firebaseio.com/cli.json {"cloudBuildErrorAfter":1594252800000,"cloudBuildWarnAfter":1590019200000,"defaultNode10After":1594252800000,"minVersion":"3.0.5","node8DeploysDisabledAfter":1613390400000,"node8RuntimeDisabledAfter":1615809600000,"node8WarnAfter":1600128000000}
+[warn] ⚠  Unable to fetch the CLI MOTD and remote config. This is not a fatal error, but may indicate an issue with your network connection. 
+[debug] [2025-06-22T17:40:47.090Z] Failed to fetch MOTD Error: EACCES: permission denied, mkdir '/Users/manu/.config/configstore'
+You don't have access to this file.
+
+[debug] [2025-06-22T17:40:58.356Z] Error: EACCES: permission denied, mkdir '/Users/manu/.config/configstore'
+You don't have access to this file.
+
+    at Object.mkdirSync (node:fs:1342:26)
+    at module.exports.sync (/Users/manu/code/manusasi.github.io/manusasi.github.io/node_modules/make-dir/index.js:114:6)
+    at set all (/Users/manu/code/manusasi.github.io/manusasi.github.io/node_modules/configstore/index.js:59:12)
+    at Configstore.set (/Users/manu/code/manusasi.github.io/manusasi.github.io/node_modules/configstore/index.js:91:12)
+    at Command.actionFn (/Users/manu/code/manusasi.github.io/manusasi.github.io/node_modules/firebase-tools/lib/commands/login.js:32:35)
+[error] 
+[error] Error: An unexpected error has occurred.
+[debug] [2025-06-22T17:40:58.620Z] Error: EACCES: permission denied, mkdir '/Users/manu/.config/configstore'
+You don't have access to this file.
+
+    at Object.mkdirSync (node:fs:1342:26)
+    at module.exports.sync (/Users/manu/code/manusasi.github.io/manusasi.github.io/node_modules/make-dir/index.js:114:6)
+    at set all (/Users/manu/code/manusasi.github.io/manusasi.github.io/node_modules/configstore/index.js:59:12)
+    at Configstore.set (/Users/manu/code/manusasi.github.io/manusasi.github.io/node_modules/configstore/index.js:91:12)
+    at process.<anonymous> (/Users/manu/code/manusasi.github.io/manusasi.github.io/node_modules/firebase-tools/lib/bin/cli.js:62:39)
+    at process.emit (node:events:519:35)
+    at process.exit (node:internal/process/per_thread:236:15)
+    at Timeout._onTimeout (/Users/manu/code/manusasi.github.io/manusasi.github.io/node_modules/firebase-tools/lib/errorOut.js:20:17)
+    at listOnTimeout (node:internal/timers:608:17)
+    at process.processTimers (node:internal/timers:543:7)
+[error] 
+[error] Error: An unexpected error has occurred.

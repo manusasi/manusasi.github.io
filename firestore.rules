@@ -1,28 +1,61 @@
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allow users to read and write their own todo lists
-    match /todoLists/{listId} {
-      allow read, write: if request.auth != null && 
-        (resource == null || resource.data.owner == request.auth.uid || 
-         request.auth.token.email in resource.data.sharedWith || 
-         resource.data.isPublic == true);
+
+    // Helper functions
+    function isOwner(familyId) {
+      return get(/databases/$(database)/documents/families/$(familyId)).data.owner == request.auth.uid;
+    }
+
+    function isSharedWith(familyId) {
+      let family = get(/databases/$(database)/documents/families/$(familyId)).data;
+      return request.auth.token.email in (family.sharedWith || []);
+    }
+
+    function canReadFamily(familyId) {
+      return isOwner(familyId) || isSharedWith(familyId);
     }
     
-    // Allow users to read and write todos in lists they have access to
-    match /todos/{todoId} {
-      allow read, write: if request.auth != null && 
-        (resource == null || 
-         // Check if user has access to the list this todo belongs to
-         exists(/databases/$(database)/documents/todoLists/$(resource.data.listId)) &&
-         (get(/databases/$(database)/documents/todoLists/$(resource.data.listId)).data.owner == request.auth.uid ||
-          request.auth.token.email in get(/databases/$(database)/documents/todoLists/$(resource.data.listId)).data.sharedWith ||
-          get(/databases/$(database)/documents/todoLists/$(resource.data.listId)).data.isPublic == true));
+    function canWriteFamily(familyId) {
+        return isOwner(familyId);
     }
-    
-    // Allow users to read and write their own user profiles
-    match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+
+    // Rules for families
+    match /families/{familyId} {
+      allow read: if canReadFamily(familyId);
+      allow create: if request.auth != null && request.resource.data.owner == request.auth.uid;
+      allow update: if canWriteFamily(familyId);
+      allow delete: if canWriteFamily(familyId);
+
+      // Rules for the 'members' subcollection
+      match /members/{memberId} {
+        allow read: if canReadFamily(familyId);
+        allow create: if canWriteFamily(familyId);
+        allow update: if canWriteFamily(familyId);
+        allow delete: if canWriteFamily(familyId);
+      }
     }
+
+    // Rules for todos and todolists
+    match /todolists/{listId} {
+       allow read, write: if request.auth != null && 
+         (resource == null || resource.data.owner == request.auth.uid || 
+          request.auth.token.email in (resource.data.sharedWith || []) || 
+          resource.data.isPublic == true);
+     }
+     
+     match /todos/{todoId} {
+       allow read, write: if request.auth != null && 
+         (resource == null || 
+          exists(/databases/$(database)/documents/todolists/$(resource.data.listId)) &&
+          (get(/databases/$(database)/documents/todolists/$(resource.data.listId)).data.owner == request.auth.uid ||
+           request.auth.token.email in (get(/databases/$(database)/documents/todolists/$(resource.data.listId)).data.sharedWith || []) ||
+           get(/databases/$(database)/documents/todolists/$(resource.data.listId)).data.isPublic == true));
+     }
+     
+     match /users/{userId} {
+       allow read, write: if request.auth != null && request.auth.uid == userId;
+     }
   }
 } 
