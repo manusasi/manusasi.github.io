@@ -20,6 +20,11 @@ export class PremierLeagueComponent implements OnInit {
   constructor(private premierLeagueService: PremierLeagueService) { }
 
   ngOnInit(): void {
+    this.loadStandings();
+  }
+
+  loadStandings(): void {
+    this.error = null;
     this.standings$ = this.premierLeagueService.getStandings().pipe(
       catchError(err => {
         this.error = err;

@@ -1,50 +1,149 @@
-<div class="page-container">
-  <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Premier League Standings</h1>
-
-  <div *ngIf="standings$ | async as standings; else loadingOrError">
-    <div *ngIf="standings && standings.length > 0; else noData">
-      <div class="overflow-x-auto shadow-md sm:rounded-lg">
-        <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-          <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-            <tr>
-              <th scope="col" class="px-6 py-3">Rank</th>
-              <th scope="col" class="px-6 py-3">Club</th>
-              <th scope="col" class="px-6 py-3">Played</th>
-              <th scope="col" class="px-6 py-3">Won</th>
-              <th scope="col" class="px-6 py-3">Drawn</th>
-              <th scope="col" class="px-6 py-3">Lost</th>
-              <th scope="col" class="px-6 py-3">Points</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let standing of standings" class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-              <td class="px-6 py-4">{{ standing.stats.rank }}</td>
-              <th scope="row" class="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap flex items-center">
-                <img [src]="standing.team.logo" [alt]="standing.team.name" class="w-6 h-6 mr-2 rounded-full">
-                {{ standing.team.name }}
-              </th>
-              <td class="px-6 py-4">{{ standing.stats.gamesPlayed }}</td>
-              <td class="px-6 py-4">{{ standing.stats.wins }}</td>
-              <td class="px-6 py-4">{{ standing.stats.ties }}</td>
-              <td class="px-6 py-4">{{ standing.stats.losses }}</td>
-              <td class="px-6 py-4 font-semibold">{{ standing.stats.points }}</td>
-            </tr>
-          </tbody>
-        </table>
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900">
+  <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6">
+    <!-- Header Section -->
+    <div class="text-center mb-6 sm:mb-8">
+      <div class="flex items-center justify-center mb-4">
+        <div class="w-12 h-12 bg-red-100 dark:bg-red-900 rounded-lg flex items-center justify-center mr-4">
+          <svg class="w-6 h-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Premier League Standings</h1>
       </div>
+      <p class="text-sm sm:text-base text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+        View the current Premier League standings and team statistics
+      </p>
     </div>
-    <ng-template #noData>
-      <p>No standings data to display.</p>
-    </ng-template>
-  </div>
 
-  <ng-template #loadingOrError>
-    <div *ngIf="error; else loading" class="text-red-500">
-      <p>Error loading standings. Please try again later.</p>
-      <pre>{{ error | json }}</pre>
+    <!-- Standings Table Card -->
+    <div class="card">
+      <div *ngIf="standings$ | async as standings; else loadingOrError">
+        <div *ngIf="standings && standings.length > 0; else noData">
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left">
+              <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                <tr>
+                  <th scope="col" class="px-4 py-3 text-center">Pos</th>
+                  <th scope="col" class="px-4 py-3">Club</th>
+                  <th scope="col" class="px-4 py-3 text-center">P</th>
+                  <th scope="col" class="px-4 py-3 text-center">W</th>
+                  <th scope="col" class="px-4 py-3 text-center">D</th>
+                  <th scope="col" class="px-4 py-3 text-center">L</th>
+                  <th scope="col" class="px-4 py-3 text-center">GF</th>
+                  <th scope="col" class="px-4 py-3 text-center">GA</th>
+                  <th scope="col" class="px-4 py-3 text-center">GD</th>
+                  <th scope="col" class="px-4 py-3 text-center font-semibold">Pts</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let standing of standings; let i = index" 
+                    class="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150">
+                  <td class="px-4 py-4 text-center font-medium">
+                    <span class="inline-flex items-center justify-center w-8 h-8 rounded-full text-sm font-semibold"
+                          [ngClass]="{
+                            'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200': i === 0,
+                            'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200': i === 1,
+                            'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200': i === 2,
+                            'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200': i >= 17,
+                            'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200': i >= 3 && i <= 6,
+                            'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200': i >= 7 && i <= 16
+                          }">
+                      {{ standing.stats.rank }}
+                    </span>
+                  </td>
+                  <th scope="row" class="px-4 py-4 font-medium text-gray-900 dark:text-white">
+                    <div class="flex items-center">
+                      <img [src]="standing.team.logo" 
+                           [alt]="standing.team.name" 
+                           class="w-8 h-8 mr-3 rounded-full object-cover">
+                      <div>
+                        <div class="font-semibold">{{ standing.team.name }}</div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400">{{ standing.team.abbreviation }}</div>
+                      </div>
+                    </div>
+                  </th>
+                  <td class="px-4 py-4 text-center">{{ standing.stats.gamesPlayed }}</td>
+                  <td class="px-4 py-4 text-center text-green-600 dark:text-green-400 font-medium">{{ standing.stats.wins }}</td>
+                  <td class="px-4 py-4 text-center text-gray-600 dark:text-gray-400">{{ standing.stats.ties }}</td>
+                  <td class="px-4 py-4 text-center text-red-600 dark:text-red-400 font-medium">{{ standing.stats.losses }}</td>
+                  <td class="px-4 py-4 text-center">{{ standing.stats.goalsFor }}</td>
+                  <td class="px-4 py-4 text-center">{{ standing.stats.goalsAgainst }}</td>
+                  <td class="px-4 py-4 text-center font-medium"
+                      [ngClass]="{
+                        'text-green-600 dark:text-green-400': standing.stats.goalDifference > 0,
+                        'text-red-600 dark:text-red-400': standing.stats.goalDifference < 0,
+                        'text-gray-600 dark:text-gray-400': standing.stats.goalDifference === 0
+                      }">
+                    {{ standing.stats.goalDifference > 0 ? '+' : '' }}{{ standing.stats.goalDifference }}
+                  </td>
+                  <td class="px-4 py-4 text-center font-bold text-lg">{{ standing.stats.points }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <!-- Legend -->
+          <div class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-3">Legend</h3>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+              <div class="flex items-center">
+                <span class="w-3 h-3 bg-yellow-100 border border-yellow-300 rounded-full mr-2"></span>
+                <span class="text-gray-600 dark:text-gray-400">Champions League</span>
+              </div>
+              <div class="flex items-center">
+                <span class="w-3 h-3 bg-blue-100 border border-blue-300 rounded-full mr-2"></span>
+                <span class="text-gray-600 dark:text-gray-400">Europa League</span>
+              </div>
+              <div class="flex items-center">
+                <span class="w-3 h-3 bg-green-100 border border-green-300 rounded-full mr-2"></span>
+                <span class="text-gray-600 dark:text-gray-400">Mid Table</span>
+              </div>
+              <div class="flex items-center">
+                <span class="w-3 h-3 bg-red-100 border border-red-300 rounded-full mr-2"></span>
+                <span class="text-gray-600 dark:text-gray-400">Relegation</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <ng-template #noData>
+          <div class="text-center py-12">
+            <div class="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">No Data Available</h3>
+            <p class="text-gray-600 dark:text-gray-400">Premier League standings are not currently available.</p>
+          </div>
+        </ng-template>
+      </div>
+
+      <ng-template #loadingOrError>
+        <div *ngIf="error; else loading" class="text-center py-12">
+          <div class="w-16 h-16 bg-red-100 dark:bg-red-900 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Error Loading Data</h3>
+          <p class="text-gray-600 dark:text-gray-400 mb-4">Unable to load Premier League standings. Please try again later.</p>
+          <button (click)="loadStandings()" class="btn-primary">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+            Retry
+          </button>
+        </div>
+        
+        <ng-template #loading>
+          <div class="text-center py-12">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4"></div>
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Loading Standings</h3>
+            <p class="text-gray-600 dark:text-gray-400">Fetching the latest Premier League data...</p>
+          </div>
+        </ng-template>
+      </ng-template>
     </div>
-    <ng-template #loading>
-      <p>Loading standings...</p>
-    </ng-template>
-  </ng-template>
+  </div>
 </div>
