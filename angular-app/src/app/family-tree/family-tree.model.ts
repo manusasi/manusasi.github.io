@@ -1,4 +1,5 @@
 import { Timestamp } from '@angular/fire/firestore';
+import { FieldValue } from '@angular/fire/firestore';
 
 export type ApprovalStatus = 'pending' | 'approved' | 'rejected';
 export type Gender = 'male' | 'female' | 'other';
@@ -8,7 +9,7 @@ export interface FamilyMember {
   firstName: string;
   lastName: string;
   gender: Gender;
-  dateOfBirth: Timestamp;
+  dateOfBirth?: Timestamp;
   dateOfDeath?: Timestamp;
   photoUrl?: string;
 
@@ -21,7 +22,7 @@ export interface FamilyMember {
   // Metadata for approval process
   status: ApprovalStatus;
   createdBy: string; // User ID
-  createdAt: Timestamp;
+  createdAt: Timestamp | FieldValue;
 }
 
 export interface Family {
@@ -33,5 +34,5 @@ export interface Family {
 
   // Metadata for approval process
   status: ApprovalStatus;
-  createdAt: Timestamp;
+  createdAt: Timestamp | FieldValue;
 } 

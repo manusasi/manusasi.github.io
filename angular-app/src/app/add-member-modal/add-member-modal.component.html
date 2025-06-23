@@ -1,0 +1,59 @@
+<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-md">
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Add Family Member</h2>
+      <button (click)="onClose()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors duration-200">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+
+    <form [formGroup]="addMemberForm" (ngSubmit)="onSubmit()" class="space-y-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label for="firstName" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">First Name *</label>
+          <input type="text" id="firstName" formControlName="firstName" 
+                 class="input-field w-full"
+                 placeholder="Enter first name">
+        </div>
+        <div>
+          <label for="lastName" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Last Name *</label>
+          <input type="text" id="lastName" formControlName="lastName" 
+                 class="input-field w-full"
+                 placeholder="Enter last name">
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label for="gender" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Gender *</label>
+          <select id="gender" formControlName="gender" class="input-field w-full">
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div>
+          <label for="dateOfBirth" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date of Birth</label>
+          <input type="date" id="dateOfBirth" formControlName="dateOfBirth" 
+                 class="input-field w-full">
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end space-x-3 pt-4">
+        <button type="button" (click)="onClose()"
+                class="btn-secondary text-sm">
+          Cancel
+        </button>
+        <button type="submit" [disabled]="!addMemberForm.valid"
+                class="btn-primary text-sm flex items-center space-x-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+          </svg>
+          <span>Add Member</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div> 

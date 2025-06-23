@@ -26,19 +26,33 @@ export class FamilyTreeService {
   // Adds a new family to the database
   async addFamily(familyData: { name: string, description?: string }): Promise<void> {
     const user = await firstValueFrom(this.auth.user$);
+    console.log('Current user:', user); // Debug log
+    
     if (!user) {
       throw new Error('User not logged in');
     }
+
+    console.log('User UID:', user.uid); // Debug log
+    console.log('User email:', user.email); // Debug log
 
     const newFamily = {
       name: familyData.name,
       description: familyData.description || '',
       owner: user.uid,
       sharedWith: [],
-      createdAt: serverTimestamp(),
-      status: 'approved'
+      status: 'approved' as const,
+      createdAt: serverTimestamp()
     };
-    await addDoc(this.familyCollection, newFamily);
+    
+    console.log('Creating family with data:', newFamily); // Debug log
+    
+    try {
+      await addDoc(this.familyCollection, newFamily);
+      console.log('Family created successfully'); // Debug log
+    } catch (error) {
+      console.error('Error creating family:', error); // Debug log
+      throw error;
+    }
   }
 
   async updateFamily(familyId: string, data: Partial<Family>): Promise<void> {
@@ -56,9 +70,16 @@ export class FamilyTreeService {
   getFamilies(): Observable<Family[]> {
     return this.auth.user$.pipe(
       switchMap(user => {
+        console.log('getFamilies - Current user:', user); // Debug log
+        
         if (!user || !user.email) {
+          console.log('getFamilies - No user or email, returning empty array'); // Debug log
           return of([]);
         }
+
+        console.log('getFamilies - User UID:', user.uid); // Debug log
+        console.log('getFamilies - User email:', user.email); // Debug log
+
         const ownedQuery = query(this.familyCollection, where('owner', '==', user.uid));
         const sharedWithQuery = query(this.familyCollection, where('sharedWith', 'array-contains', user.email));
 
@@ -67,11 +88,16 @@ export class FamilyTreeService {
 
         return combineLatest([owned$, shared$]).pipe(
           map(([owned, shared]) => {
+            console.log('getFamilies - Owned families:', owned); // Debug log
+            console.log('getFamilies - Shared families:', shared); // Debug log
+            
             const all = [...owned, ...shared];
             const unique = all.filter((family, index, self) =>
               index === self.findIndex((f) => (f.id === family.id))
             );
-            return unique.sort((a, b) => a.name.localeCompare(b.name));
+            const result = unique.sort((a, b) => a.name.localeCompare(b.name));
+            console.log('getFamilies - Final result:', result); // Debug log
+            return result;
           })
         );
       })
@@ -105,14 +131,19 @@ export class FamilyTreeService {
 
     const memberCollectionRef = collection(this.firestore, 'families', familyId, 'members');
     
-    const newMember: Omit<FamilyMember, 'id'> = {
+    const newMember = {
       ...memberData,
       familyId: familyId,
-      status: 'approved',
+      status: 'approved' as const,
       createdBy: user.uid,
       createdAt: serverTimestamp(),
-    } as Omit<FamilyMember, 'id'>;
+    };
 
     await addDoc(memberCollectionRef, newMember);
+  }
+
+  async updateFamilyMember(familyId: string, memberId: string, memberData: Partial<FamilyMember>): Promise<void> {
+    const memberDocRef = doc(this.firestore, 'families', familyId, 'members', memberId);
+    await updateDoc(memberDocRef, memberData);
   }
 }

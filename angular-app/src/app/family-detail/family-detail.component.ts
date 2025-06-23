@@ -7,13 +7,15 @@ import { Observable, of } from 'rxjs';
 import { switchMap, tap } from 'rxjs/operators';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../auth.service';
-import { Timestamp } from '@angular/fire/firestore';
 import { BreadcrumbComponent, BreadcrumbItem } from '../breadcrumb.component';
+import { AddMemberModalComponent } from '../add-member-modal/add-member-modal.component';
+import { EditMemberModalComponent } from '../edit-member-modal/edit-member-modal.component';
+import { ShareFamilyModalComponent } from '../share-family-modal/share-family-modal.component';
 
 @Component({
   selector: 'app-family-detail',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, BreadcrumbComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, BreadcrumbComponent, AddMemberModalComponent, EditMemberModalComponent, ShareFamilyModalComponent],
   templateUrl: './family-detail.component.html',
   styleUrl: './family-detail.component.css'
 })
@@ -23,9 +25,11 @@ export class FamilyDetailComponent implements OnInit {
   familyId: string | null = null;
   
   isEditing = false;
+  isAddMemberModalOpen = false;
+  isEditMemberModalOpen = false;
+  isShareModalOpen = false;
+  selectedMember: FamilyMember | null = null;
   editForm: FormGroup;
-  addShareUserForm: FormGroup;
-  addMemberForm: FormGroup;
   
   breadcrumbItems: BreadcrumbItem[] = [];
 
@@ -41,17 +45,6 @@ export class FamilyDetailComponent implements OnInit {
     this.editForm = this.fb.group({
       name: ['', Validators.required],
       description: ['']
-    });
-
-    this.addShareUserForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]]
-    });
-
-    this.addMemberForm = this.fb.group({
-      firstName: ['', Validators.required],
-      lastName: ['', Validators.required],
-      gender: ['male', Validators.required],
-      dateOfBirth: ['', Validators.required],
     });
   }
 
@@ -123,31 +116,68 @@ export class FamilyDetailComponent implements OnInit {
     }
   }
 
-  async addFamilyMember(): Promise<void> {
-    if (this.addMemberForm.valid && this.familyId) {
+  openAddMemberModal(): void {
+    this.isAddMemberModalOpen = true;
+  }
+
+  closeAddMemberModal(): void {
+    this.isAddMemberModalOpen = false;
+  }
+
+  openEditMemberModal(member: FamilyMember): void {
+    this.selectedMember = member;
+    this.isEditMemberModalOpen = true;
+  }
+
+  closeEditMemberModal(): void {
+    this.isEditMemberModalOpen = false;
+    this.selectedMember = null;
+  }
+
+  async handleAddMember(memberData: any): Promise<void> {
+    if (this.familyId) {
       try {
-        const memberData = this.addMemberForm.value;
-        const date = new Date(memberData.dateOfBirth);
-        memberData.dateOfBirth = Timestamp.fromDate(date);
         await this.familyTreeService.addFamilyMember(this.familyId, memberData);
-        this.addMemberForm.reset({ gender: 'male' });
+        this.closeAddMemberModal();
       } catch (error) {
         console.error('Error adding family member:', error);
       }
     }
   }
 
-  async addSharedUser(): Promise<void> {
-    if (this.addShareUserForm.valid && this.familyId) {
-      const { email } = this.addShareUserForm.value;
-      await this.familyTreeService.shareFamily(this.familyId, email);
-      this.addShareUserForm.reset();
+  async handleUpdateMember(updateData: any): Promise<void> {
+    if (this.familyId && updateData.memberId) {
+      try {
+        const { memberId, ...memberData } = updateData;
+        await this.familyTreeService.updateFamilyMember(this.familyId, memberId, memberData);
+        this.closeEditMemberModal();
+      } catch (error) {
+        console.error('Error updating family member:', error);
+      }
     }
   }
 
-  async removeSharedUser(email: string): Promise<void> {
-    if (this.familyId) {
-      await this.familyTreeService.removeSharedUser(this.familyId, email);
-    }
+  openShareModal(): void {
+    this.isShareModalOpen = true;
+  }
+
+  closeShareModal(): void {
+    this.isShareModalOpen = false;
+  }
+
+  handleUserAdded(email: string): void {
+    // The family observable will automatically update due to Firestore real-time updates
+    console.log('User added:', email);
+  }
+
+  formatDateForDisplay(timestamp: any): string {
+    if (!timestamp) return '';
+    const date = timestamp.toDate();
+    const options: Intl.DateTimeFormatOptions = { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    };
+    return date.toLocaleDateString(undefined, options);
   }
 }
